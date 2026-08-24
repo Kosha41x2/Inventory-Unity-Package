@@ -1,0 +1,223 @@
+using UnityEngine;
+using UnityEngine.UIElements;
+using System.Collections.Generic;
+
+public class InventoryUI : MonoBehaviour
+{
+    private VisualElement root;
+    private VisualElement inventoryPanel;
+
+    private static VisualElement cursorFrame;
+    private static Label cursorStackLabel;
+
+    [Header("Backend Connections")]
+    [Tooltip("Drag an object with an Inventory component to this field. This will make this UI display the inventory of that object")]
+    [SerializeField] private Inventory inventory;
+
+    [Header("UI Toolkit Settings")]
+    [SerializeField] private UIDocumentSettings uiSettings;
+
+    [Header("Slot Action Bindings")]
+    [Tooltip("A list of slot action bindings that define the actions to be executed when specific conditions are met")]
+    [SerializeField]
+    private List<SlotActionBinding> slotActionBindings = new List<SlotActionBinding>();
+
+    public static VisualElement CursorFrame => cursorFrame;
+    public static Label CursorStackLabel => cursorStackLabel;
+    void Awake()
+    {
+        root = GetComponent<UIDocument>().rootVisualElement;
+        inventoryPanel = root.Q<VisualElement>(uiSettings.inventoryPanelName);
+        inventory.OnInventorySizeChanged += BuildInventory;
+        inventory.OnInventoryContentChanged += UpdateInventoryContent;
+        inventory.OnSlotContentChanged += UpdateSlot;
+        inventory.OnDraggedSlotContentChanged += UpdateDraggedSlotVisuals;
+    }
+
+    void OnDestroy()
+    {
+        inventory.OnInventorySizeChanged -= BuildInventory;
+        inventory.OnInventoryContentChanged -= UpdateInventoryContent;
+        inventory.OnSlotContentChanged -= UpdateSlot;
+        inventory.OnDraggedSlotContentChanged -= UpdateDraggedSlotVisuals;
+    }
+
+    void SetInventory(Inventory newInventory)
+    {
+        InitializeCursorFrame();
+
+        if (this.inventory != null)
+        {
+            this.inventory.OnInventorySizeChanged -= BuildInventory;
+            this.inventory.OnInventoryContentChanged -= UpdateInventoryContent;
+            this.inventory.OnSlotContentChanged -= UpdateSlot;
+            this.inventory.OnDraggedSlotContentChanged -= UpdateDraggedSlotVisuals;
+        }
+
+        this.inventory = newInventory;
+        inventory.OnInventorySizeChanged += BuildInventory;
+        inventory.OnInventoryContentChanged += UpdateInventoryContent;
+        inventory.OnSlotContentChanged += UpdateSlot;
+        inventory.OnDraggedSlotContentChanged += UpdateDraggedSlotVisuals;
+    }
+
+/// <summary>
+/// This method builds the inventory UI based on the given inventory.
+/// </summary>
+/// <param name="inventory"></param>
+    void BuildInventory(Inventory inventory)
+    {
+        inventoryPanel.Clear();
+
+        int rows = inventory.InventoryVerticalSize;
+        int columns = inventory.InventoryHorizontalSize;
+
+        for(int y = 0; y < rows; y++)
+        {
+            string rowName = $"Row {y}";
+            VisualElement row = new VisualElement();
+            row.name = rowName;
+            row.dataSource = y;
+            row.AddToClassList(uiSettings.slotSubContainerClassName);
+            inventoryPanel.Add(row);
+
+            for(int x = 0; x < columns; x++)
+            {
+                string slotName = $"Slot {x}_{y}";
+                VisualElement slot = new VisualElement();
+                slot.name = slotName;
+                slot.AddToClassList(uiSettings.itemSlotClassName);
+                row.Add(slot);
+
+                string itemFrameName = $"ItemFrame {x}_{y}";
+                VisualElement itemFrame = new VisualElement();
+                itemFrame.name = itemFrameName;
+                itemFrame.AddToClassList(uiSettings.itemFrameClassName);
+
+                itemFrame.AddManipulator(new ItemManipulator(inventory, slotActionBindings));
+
+                slot.Add(itemFrame);
+
+
+
+                string stackSizeName = $"StackSize {x}_{y}";
+                Label stackSizeLabel = new Label();
+                stackSizeLabel.name = stackSizeName;
+                stackSizeLabel.AddToClassList(uiSettings.stackSizeLabelClassName);
+                itemFrame.Add(stackSizeLabel);
+            }
+        }
+    }
+
+    private void InitializeCursorFrame()
+    {
+        cursorFrame = new VisualElement();
+        cursorFrame.name = "CursorFrame";
+        cursorFrame.AddToClassList(uiSettings.itemFrameClassName);
+        cursorFrame.style.position = Position.Absolute;
+        cursorFrame.style.display = DisplayStyle.None;
+        cursorFrame.pickingMode = PickingMode.Ignore;
+
+        cursorStackLabel = new Label();
+        cursorStackLabel.AddToClassList(uiSettings.stackSizeLabelClassName);
+        cursorFrame.Add(cursorStackLabel);
+
+        root.Add(cursorFrame);
+    }
+
+    private void UpdateDraggedSlotVisuals(Inventory inv)
+    {
+        if (cursorFrame == null || cursorStackLabel == null)
+        {
+            Debug.LogWarning("Cursor frame or stack label is not initialized. Initializing now.");
+            InitializeCursorFrame();
+            
+            if (cursorFrame == null) return; 
+        }
+
+        Slot draggedSlot = inv.DraggedSlot;
+
+        if (draggedSlot == null || draggedSlot.IsEmpty() || draggedSlot.CurrentItem == null)
+        {
+            cursorFrame.style.display = DisplayStyle.None;
+            cursorFrame.style.backgroundImage = new StyleBackground();
+            cursorStackLabel.text = string.Empty;
+        }
+        else
+        {
+            cursorFrame.style.display = DisplayStyle.Flex;
+            cursorFrame.style.backgroundImage = new StyleBackground(draggedSlot.CurrentItem.ItemIcon);
+            cursorStackLabel.text = draggedSlot.CurrentAmount.ToString();
+        }
+    }
+
+    /// <summary>
+    /// This method updates the inventory UI content based on the given inventory.
+    /// It sets the background image of each item frame based on the item in the corresponding slot
+    /// </summary>
+    /// <param name="inventory"></param>
+    private void UpdateInventoryContent(Inventory inventory)
+    {
+        int rows = inventory.InventoryVerticalSize;
+        int columns = inventory.InventoryHorizontalSize;
+
+        for(int y = 0; y < rows; y++)
+        {
+            for(int x = 0; x < columns; x++)
+            {
+                UpdateSlot(inventory, new Vector2Int(x, y));
+            }
+        }
+    }
+
+    /// <summary>
+    /// This method updates a specific slot in the inventory UI based on the given inventory and position.
+    /// It sets the background image of the item frame based on the item in the corresponding slot
+    /// </summary>
+    /// <param name="inventory"></param>
+    /// <param name="position"></param>
+    void UpdateSlot(Inventory inventory, Vector2Int position)
+    {
+        Slot slotData = inventory.GetSlot(position.x, position.y);
+        VisualElement slot = inventoryPanel.Q<VisualElement>($"Slot {position.x}_{position.y}");
+        if(slot == null) return;
+
+        slot.dataSource = position;
+        VisualElement itemFrame = slot.Q<VisualElement>($"ItemFrame {position.x}_{position.y}");
+        Label stackSizeLabel = itemFrame.Q<Label>($"StackSize {position.x}_{position.y}");
+
+        if(itemFrame == null) 
+            {Debug.LogWarning($"ItemFrame {position.x}_{position.y} not found.");
+            return;
+        }
+
+        if(stackSizeLabel == null) 
+            {Debug.LogWarning($"StackSize {position.x}_{position.y} not found.");
+            return;
+        }
+
+        UpdateFrame(slotData, itemFrame, stackSizeLabel);
+    }
+
+    private void UpdateFrame(Slot slotData, VisualElement itemFrame, Label stackSizeLabel = null)
+    {
+        if (stackSizeLabel == null)
+        {
+            stackSizeLabel = new Label();
+            stackSizeLabel.AddToClassList(uiSettings.stackSizeLabelClassName);
+            stackSizeLabel.name = $"StackSize {itemFrame.name}";
+            itemFrame.Add(stackSizeLabel);
+        }
+
+        if(slotData.IsEmpty())
+        {
+            itemFrame.style.backgroundImage = new StyleBackground();
+            stackSizeLabel.text = string.Empty;
+        }
+        else
+        {
+            itemFrame.style.backgroundImage = new StyleBackground(slotData.CurrentItem.ItemIcon);
+            stackSizeLabel.text = slotData.CurrentAmount.ToString();
+        }
+    }
+}

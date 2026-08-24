@@ -1,0 +1,33 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+[CreateAssetMenu(fileName = "Item", menuName = "Scriptable Objects/Item")]
+public class Item : ScriptableObject
+{
+    [SerializeField] private string itemName;
+    [SerializeField] private Texture2D itemIcon;
+
+    [SerializeField] private int itemID;
+
+    [SerializeField] private int stackSize;
+
+    [SerializeField] private List<ItemComponent> itemComponents = new List<ItemComponent>();
+
+    public string ItemName => itemName;
+    public Texture2D ItemIcon => itemIcon;
+    public int ItemID => itemID;
+    public int StackSize => stackSize;
+    public IEnumerable<ItemComponent> ItemComponents => itemComponents;
+
+    public T getComponent<T>() where T : ItemComponent
+    {
+        foreach (var component in itemComponents)
+        {
+            if (component is T typedComponent)
+            {
+                return typedComponent;
+            }
+        }
+        return null;
+    }
+}
