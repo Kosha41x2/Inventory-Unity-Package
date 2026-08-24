@@ -17,10 +17,20 @@ public class InventoryUI : MonoBehaviour
     [Header("UI Toolkit Settings")]
     [SerializeField] private UIDocumentSettings uiSettings;
 
-    [Header("Slot Action Bindings")]
-    [Tooltip("A list of slot action bindings that define the actions to be executed when specific conditions are met")]
+    [Header("Slot Down Action Bindings")]
+    [Tooltip("A list of actions that will be executed when a slot is clicked or pressed down. You can configure the mouse button and modifier key for each action.")]
     [SerializeField]
-    private List<SlotActionBinding> slotActionBindings = new List<SlotActionBinding>();
+    private List<SlotActionBinding<PointerDownEvent>> slotDownActionBindings = new List<SlotActionBinding<PointerDownEvent>>();
+
+    [Header("Slot Up Action Bindings")]
+    [Tooltip("A list of actions that will be executed when a slot is released or pressed up. You can configure the mouse button and modifier key for each action.")]
+    [SerializeField]
+    private List<SlotActionBinding<PointerUpEvent>> slotUpActionBindings = new List<SlotActionBinding<PointerUpEvent>>();
+
+    [Header("Slot Move Action Bindings")]
+    [Tooltip("A list of actions that will be executed when a slot is hovered or moved over. You can configure the mouse button and modifier key for each action.")]
+    [SerializeField]
+    private List<SlotActionBinding<PointerMoveEvent>> slotMoveActionBindings = new List<SlotActionBinding<PointerMoveEvent>>();
 
     public static VisualElement CursorFrame => cursorFrame;
     public static Label CursorStackLabel => cursorStackLabel;
@@ -94,7 +104,7 @@ public class InventoryUI : MonoBehaviour
                 itemFrame.name = itemFrameName;
                 itemFrame.AddToClassList(uiSettings.itemFrameClassName);
 
-                itemFrame.AddManipulator(new ItemManipulator(inventory, slotActionBindings));
+                itemFrame.AddManipulator(new ItemManipulator(inventory, slotDownActionBindings, slotUpActionBindings, slotMoveActionBindings));
 
                 slot.Add(itemFrame);
 
@@ -219,5 +229,11 @@ public class InventoryUI : MonoBehaviour
             itemFrame.style.backgroundImage = new StyleBackground(slotData.CurrentItem.ItemIcon);
             stackSizeLabel.text = slotData.CurrentAmount.ToString();
         }
+    }
+
+    public static void AdjuctCursorFrame(VisualElement model)
+    {
+        cursorFrame.style.width = model.resolvedStyle.width;
+        cursorFrame.style.height = model.resolvedStyle.height;
     }
 }

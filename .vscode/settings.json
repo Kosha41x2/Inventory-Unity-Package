@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "My-weird-shaped-tool.slnx"
+    "dotnet.defaultSolution": "Inventory Unity Package.slnx"
 }
