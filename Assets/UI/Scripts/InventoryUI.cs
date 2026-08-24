@@ -3,6 +3,8 @@ using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
 
+
+[AddComponentMenu("Inventory System/UI/Inventory UI")]
 public class InventoryUI : MonoBehaviour
 {
     private VisualElement root;

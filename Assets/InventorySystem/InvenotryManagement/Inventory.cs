@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using UnityEngine;
+[AddComponentMenu("Inventory System/Core/Inventory Backend")]
 public class Inventory : MonoBehaviour
 {
     [SerializeField] private int inventoryHorizontalSize = 10;
