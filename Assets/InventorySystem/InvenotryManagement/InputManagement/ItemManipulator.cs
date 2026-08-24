@@ -7,15 +7,16 @@ using System.Collections.Generic;
 /// </summary>
 public class ItemManipulator : PointerManipulator
 {
-    private double maxInteractionDistance = 100.0;
     private VisualElement originalSlot;
     
     private Inventory backendInventory;
 
-    private List<SlotActionBinding<PointerDownEvent>> slotDownActionBindings = new List<SlotActionBinding<PointerDownEvent>>();
-    private List<SlotActionBinding<PointerUpEvent>> slotUpActionBindings = new List<SlotActionBinding<PointerUpEvent>>();
-    private List<SlotActionBinding<PointerMoveEvent>> slotMoveActionBindings = new List<SlotActionBinding<PointerMoveEvent>>();
-    private static bool isDragging = false;
+    private string slotClassName;
+
+    private List<SlotDownBinding> slotDownActionBindings = new List<SlotDownBinding>();
+    private List<SlotUpBinding> slotUpActionBindings = new List<SlotUpBinding>();
+    private List<SlotMoveBinding> slotMoveActionBindings = new List<SlotMoveBinding>();
+    public static bool isDragging = false;
 
     /// <summary>
     /// Initializes a new instance of the ItemManipulator class.
@@ -23,14 +24,16 @@ public class ItemManipulator : PointerManipulator
     /// <param name="inventory">The backend inventory reference.</param>
     /// <param name="slotActionBindings">The list of slot action bindings.</param>
     public ItemManipulator(Inventory inventory,
-        List<SlotActionBinding<PointerDownEvent>> slotDownActionBindings,
-        List<SlotActionBinding<PointerUpEvent>> slotUpActionBindings,
-        List<SlotActionBinding<PointerMoveEvent>> slotMoveActionBindings)
+        List<SlotDownBinding> slotDownActionBindings,
+        List<SlotUpBinding> slotUpActionBindings,
+        List<SlotMoveBinding> slotMoveActionBindings,
+        string slotCassName)
     {
         this.backendInventory = inventory;
         this.slotDownActionBindings = slotDownActionBindings;
         this.slotUpActionBindings = slotUpActionBindings;
         this.slotMoveActionBindings = slotMoveActionBindings;
+        this.slotClassName = slotCassName;
     }
     
     /// <summary>
@@ -67,7 +70,7 @@ public class ItemManipulator : PointerManipulator
                  (evt.modifiers & binding.requiredModifier) == binding.requiredModifier)
                   && (binding.whileDragging == isDragging))
             {
-                binding.actionToExecute?.Invoke(backendInventory, (Vector2Int)originalSlot.dataSource, target.panel.Pick(evt.position), evt);
+                binding.action?.Invoke(backendInventory, GetTargetSlot(target.panel.Pick(evt.position)), evt);
             }
         }
     }
@@ -86,7 +89,7 @@ public class ItemManipulator : PointerManipulator
                  (evt.modifiers & binding.requiredModifier) == binding.requiredModifier)
                   && (binding.whileDragging == isDragging))
             {
-                binding.actionToExecute?.Invoke(backendInventory, (Vector2Int)originalSlot.dataSource, target.panel.Pick(evt.position), evt);
+                binding.action?.Invoke(backendInventory, GetTargetSlot(target.panel.Pick(evt.position)), evt);
             }
         } 
    }
@@ -105,8 +108,27 @@ public class ItemManipulator : PointerManipulator
                  (evt.modifiers & binding.requiredModifier) == binding.requiredModifier)
                   && (binding.whileDragging == isDragging))
             {
-                binding.actionToExecute?.Invoke(backendInventory, (Vector2Int)originalSlot.dataSource, target.panel.Pick(evt.position), evt);
+                binding.action?.Invoke(backendInventory, GetTargetSlot(target.panel.Pick(evt.position)), evt);
             }
         } 
-   }
+    }
+
+    /// <summary>
+    /// Finds the target slot visual element based on the element under the pointer. It traverses up the visual tree to find a parent element that matches the slot class name and has a valid data source.
+    /// </summary>
+    /// <param name="elementUnderPointer"></param>
+    /// <returns></returns>
+    private VisualElement GetTargetSlot(VisualElement elementUnderPointer)
+    {
+        VisualElement current = elementUnderPointer;
+        while (current != null)
+        {
+            if (current.ClassListContains(slotClassName) && current.dataSource is Vector2Int pos)
+            {
+                return current;
+            }
+            current = current.parent;
+        }
+        return null;
+    }
 }

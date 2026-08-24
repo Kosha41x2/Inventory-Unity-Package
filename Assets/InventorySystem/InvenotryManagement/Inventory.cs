@@ -156,6 +156,10 @@ public class Inventory : MonoBehaviour
         OnSlotContentChanged?.Invoke(this, posB);
     }
 
+    /// <summary>
+    /// Swaps the contents of the dragged slot with a specified slot in the inventory. If either slot is empty, it will simply copy the contents of the other slot to the empty one.
+    /// </summary>
+    /// <param name="posB"></param>
     public void SwapDraggedSlot(Vector2Int posB)
     {
         Slot slotB = GetSlot(posB.x, posB.y);
@@ -172,6 +176,11 @@ public class Inventory : MonoBehaviour
         OnDraggedSlotContentChanged?.Invoke(this);
     }
 
+    /// <summary>
+    /// Retrieves a slot from the inventory based on its position. Returns null if the position is out of bounds.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
     public Slot GetSlot(Vector2Int position)
     {
         return GetSlot(position.x, position.y);
@@ -189,6 +198,12 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Merges the contents of two slots in the inventory. If the items in both slots are the same and the target slot has enough space, it will transfer as many items as possible from the source slot to the target slot.
+    /// </summary>
+    /// <param name="sourcePos"></param>
+    /// <param name="targetPos"></param>
+    /// <returns></returns>
     public bool MergeSlots(Vector2Int sourcePos, Vector2Int targetPos)
     {
         Slot sourceSlot = GetSlot(sourcePos);
@@ -211,6 +226,11 @@ public class Inventory : MonoBehaviour
         return merged;
     }
 
+    /// <summary>
+    /// Merges the contents of the dragged slot with a specified slot in the inventory. If the items in both slots are the same and the target slot has enough space, it will transfer as many items as possible from the dragged slot to the target slot.
+    /// </summary>
+    /// <param name="targetPos"></param>
+    /// <returns></returns>
     public bool MergeSlotWithDragged(Vector2Int targetPos)
     {
         Slot targetSlot = GetSlot(targetPos);
@@ -232,6 +252,12 @@ public class Inventory : MonoBehaviour
         return merged;
     }
 
+    /// <summary>
+    /// Removes a specified amount of items from a slot in the inventory. If the slot has fewer items than the specified amount, it will remove all items from the slot and return the remaining amount that could not be removed.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="amount"></param>
+    /// <returns></returns>
     public int RemoveItemFromSlot(Vector2Int position, int amount)
     {
         Slot slot = GetSlot(position);
@@ -245,6 +271,11 @@ public class Inventory : MonoBehaviour
         return amount;
     }
 
+    /// <summary>
+    /// Removes a specified amount of items from the dragged slot. If the dragged slot has fewer items than the specified amount, it will remove all items from the dragged slot and return the remaining amount that could not be removed.
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <returns></returns>
     public int RemoveItemFromDraggedSlot(int amount)
     {
         if (draggedSlot != null)
@@ -256,6 +287,13 @@ public class Inventory : MonoBehaviour
         return amount;
     }
 
+
+    /// <summary>
+    /// Adds a specified amount of an item to the dragged slot. If the dragged slot already contains a different item, it will not add the new item and return the full amount. If the dragged slot is empty or contains the same item, it will add as many items as possible and return the remaining amount that could not be added.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="amount"></param>
+    /// <returns></returns>
     public int AddItemToDraggedSlot(Item item, int amount)
     {
         if (draggedSlot != null)
@@ -266,6 +304,14 @@ public class Inventory : MonoBehaviour
         }
         return amount;
     }
+
+    /// <summary>
+    /// Adds a specified amount of an item to a slot in the inventory. If the slot already contains a different item, it will not add the new item and return the full amount. If the slot is empty or contains the same item, it will add as many items as possible and return the remaining amount that could not be added.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="item"></param>
+    /// <param name="amount"></param>
+    /// <returns></returns>
 
     public int AddItemToSlot(Vector2Int position, Item item, int amount)
     {
@@ -278,6 +324,14 @@ public class Inventory : MonoBehaviour
         }
         return amount;
     }
+
+
+    /// <summary>
+    /// Transfers a specified amount of items from a slot in the inventory to the dragged slot. If the source slot has fewer items than the specified amount, it will transfer all items from the source slot and return the remaining amount that could not be transferred.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="amount"></param>
+    /// <returns></returns>
 
     public bool TransferFromSlotToDragged(Vector2Int position, int amount)
     {
@@ -296,6 +350,12 @@ public class Inventory : MonoBehaviour
         return remainingAmount == 0;
     }
 
+    /// <summary>
+    /// Transfers a specified amount of items from the dragged slot to a slot in the inventory. If the dragged slot has fewer items than the specified amount, it will transfer all items from the dragged slot and return the remaining amount that could not be transferred.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="amount"></param>
+    /// <returns>success on transfer</returns>
     public bool TransferFromDraggedToSlot(Vector2Int position, int amount)
     {
         if (draggedSlot == null) return false;

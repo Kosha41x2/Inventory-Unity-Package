@@ -3,21 +3,41 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [System.Serializable]
-
-public class InventorySlotDownEvent<T> : UnityEvent<Inventory, Vector2Int, VisualElement, PointerEventBase<T>> where T : PointerEventBase<T>, new() { }
+public class SlotDownEvent : UnityEvent<Inventory, VisualElement, PointerDownEvent> { }
 
 [System.Serializable]
-public class SlotActionBinding<T> where T : PointerEventBase<T>, new()
-{
-    [Tooltip("Check this if the action should trigger while dragging an item (you usually want this for drop actions in other slots).")]
-    public bool whileDragging = false;
+public class SlotMoveEvent : UnityEvent<Inventory, VisualElement, PointerMoveEvent> { }
 
-    [Tooltip("The needed mouse button to trigger the action (Left, Right, Middle). Ignored if it's a move event.")]
-    public MouseButton requiredButton = MouseButton.LeftMouse;
+[System.Serializable]
+public class SlotUpEvent : UnityEvent<Inventory, VisualElement, PointerUpEvent> { }
+
+[System.Serializable]
+public class SlotActionBindingBase
+{
+    [Tooltip("Check this if the action should trigger while dragging an item (usually used to move or drop items in the inventory).")]
+    public bool whileDragging = false;
 
     [Tooltip("The optional modifier key (Shift, Ctrl, Alt)")]
     public EventModifiers requiredModifier = EventModifiers.None;
+}
 
-    [Tooltip("The action to execute when the required button and modifier are pressed on a slot")]
-    public InventorySlotDownEvent<T> actionToExecute;
+[System.Serializable]
+public class SlotDownBinding : SlotActionBindingBase
+{
+    [Tooltip("The needed mouse button to trigger the action.")]
+    public MouseButton requiredButton = MouseButton.LeftMouse;
+    public SlotDownEvent action;
+}
+
+[System.Serializable]
+public class SlotMoveBinding : SlotActionBindingBase
+{
+    public SlotMoveEvent action;
+}
+
+[System.Serializable]
+public class SlotUpBinding : SlotActionBindingBase
+{
+    public MouseButton requiredButton = MouseButton.LeftMouse;
+    public SlotUpEvent action;
 }

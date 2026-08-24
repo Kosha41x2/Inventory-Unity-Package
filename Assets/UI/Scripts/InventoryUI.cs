@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using System.Linq;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -20,17 +21,17 @@ public class InventoryUI : MonoBehaviour
     [Header("Slot Down Action Bindings")]
     [Tooltip("A list of actions that will be executed when a slot is clicked or pressed down. You can configure the mouse button and modifier key for each action.")]
     [SerializeField]
-    private List<SlotActionBinding<PointerDownEvent>> slotDownActionBindings = new List<SlotActionBinding<PointerDownEvent>>();
+    private List<SlotDownBinding> slotDownActionBindings = new List<SlotDownBinding>();
 
     [Header("Slot Up Action Bindings")]
     [Tooltip("A list of actions that will be executed when a slot is released or pressed up. You can configure the mouse button and modifier key for each action.")]
     [SerializeField]
-    private List<SlotActionBinding<PointerUpEvent>> slotUpActionBindings = new List<SlotActionBinding<PointerUpEvent>>();
+    private List<SlotUpBinding> slotUpActionBindings = new List<SlotUpBinding>();
 
     [Header("Slot Move Action Bindings")]
     [Tooltip("A list of actions that will be executed when a slot is hovered or moved over. You can configure the mouse button and modifier key for each action.")]
     [SerializeField]
-    private List<SlotActionBinding<PointerMoveEvent>> slotMoveActionBindings = new List<SlotActionBinding<PointerMoveEvent>>();
+    private List<SlotMoveBinding> slotMoveActionBindings = new List<SlotMoveBinding>();
 
     public static VisualElement CursorFrame => cursorFrame;
     public static Label CursorStackLabel => cursorStackLabel;
@@ -79,6 +80,8 @@ public class InventoryUI : MonoBehaviour
     {
         inventoryPanel.Clear();
 
+        InitializeCursorFrame();
+
         int rows = inventory.InventoryVerticalSize;
         int columns = inventory.InventoryHorizontalSize;
 
@@ -104,7 +107,7 @@ public class InventoryUI : MonoBehaviour
                 itemFrame.name = itemFrameName;
                 itemFrame.AddToClassList(uiSettings.itemFrameClassName);
 
-                itemFrame.AddManipulator(new ItemManipulator(inventory, slotDownActionBindings, slotUpActionBindings, slotMoveActionBindings));
+                itemFrame.AddManipulator(new ItemManipulator(inventory, slotDownActionBindings, slotUpActionBindings, slotMoveActionBindings, uiSettings.itemSlotClassName));
 
                 slot.Add(itemFrame);
 
@@ -209,6 +212,12 @@ public class InventoryUI : MonoBehaviour
         UpdateFrame(slotData, itemFrame, stackSizeLabel);
     }
 
+    /// <summary>
+    /// Updates the visual representation of a slot based on the provided slot data, item frame, and stack size label. If the slot is empty, it clears the background image and stack size label. If the slot contains an item, it sets the background image to the item's icon and updates the stack size label with the current amount of items in the slot.
+    /// </summary>
+    /// <param name="slotData"></param>
+    /// <param name="itemFrame"></param>
+    /// <param name="stackSizeLabel"></param>
     private void UpdateFrame(Slot slotData, VisualElement itemFrame, Label stackSizeLabel = null)
     {
         if (stackSizeLabel == null)
@@ -231,9 +240,27 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
-    public static void AdjuctCursorFrame(VisualElement model)
+    /// <summary>
+    /// Adjusts the size of the cursor frame to match the size of the provided model visual element. This is typically used to ensure that the cursor frame visually matches the item being dragged or interacted with in the inventory UI.
+    /// Usually necessary when getting an item from a slot and dragging it, so the cursor frame matches the size of the item frame.
+    /// </summary>
+    /// <param name="model"></param>
+    public static void AdjustCursorFrame(VisualElement model)
     {
         cursorFrame.style.width = model.resolvedStyle.width;
         cursorFrame.style.height = model.resolvedStyle.height;
+    }
+
+    /// <summary>
+    /// Updates the position of the cursor frame to follow the mouse cursor. The cursor frame is
+    /// centered on the cursor position, and its position is adjusted based on its width and height to ensure it remains centered.
+    /// </summary>
+    /// <param name="position"></param>
+    public static void UpdateCursorFramePosition(Vector2 position)
+    {
+        if (cursorFrame == null) return;
+
+        cursorFrame.style.left = position.x - cursorFrame.resolvedStyle.width / 2;
+        cursorFrame.style.top = position.y - cursorFrame.resolvedStyle.height / 2;
     }
 }
