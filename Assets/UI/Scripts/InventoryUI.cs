@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
 
-
+[ExecuteAlways]
 [AddComponentMenu("Inventory System/UI/Inventory UI")]
 public class InventoryUI : MonoBehaviour
 {
@@ -37,9 +37,12 @@ public class InventoryUI : MonoBehaviour
 
     public static VisualElement CursorFrame => cursorFrame;
     public static Label CursorStackLabel => cursorStackLabel;
-    void Awake()
+    void OnEnable()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
+
+        if (root == null || uiSettings == null) return;
+        
         inventoryPanel = root.Q<VisualElement>(uiSettings.inventoryPanelName);
         inventory.OnInventorySizeChanged += BuildInventory;
         inventory.OnInventoryContentChanged += UpdateInventoryContent;
@@ -47,7 +50,7 @@ public class InventoryUI : MonoBehaviour
         inventory.OnDraggedSlotContentChanged += UpdateDraggedSlotVisuals;
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
         inventory.OnInventorySizeChanged -= BuildInventory;
         inventory.OnInventoryContentChanged -= UpdateInventoryContent;

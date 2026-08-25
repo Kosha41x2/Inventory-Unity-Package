@@ -1,6 +1,8 @@
 using NUnit.Framework;
 using System;
 using UnityEngine;
+
+[ExecuteAlways]
 [AddComponentMenu("Inventory System/Core/Inventory Backend")]
 public class Inventory : MonoBehaviour
 {
@@ -35,12 +37,13 @@ public class Inventory : MonoBehaviour
         }
 
         draggedSlot = new Slot();
-    }
 
-    public void Awake()
-    {
-        InitializeInventory();
         OnInventorySizeChanged?.Invoke(this);
+    }
+    private void OnValidate()
+    {
+        if (inventoryHorizontalSize < 1 || inventoryVerticalSize < 1) return;
+        InitializeInventory();
     }
 
     public void Start()
