@@ -1,9 +1,15 @@
 using UnityEngine;
 using UnityEngine.UIElements;
-public class NewMonoBehaviourScript : MonoBehaviour
+public class InputActions : MonoBehaviour
 {
-    public void SwapItems(Inventory inventory, VisualElement slotElement, PointerDownEvent evt)
+    [SerializeField] private float maxDistance = 100f;
+    public void SwapItems(InventoryInputDownEventInfo evt)
     {
+        if (!evt.ContextInfo.HasSlotBeenClicked()) return;
+
+        Inventory inventory = evt.ContextInfo.BackendInventory;
+        VisualElement slotElement = evt.ContextInfo.SlotElement;
+
         Slot slot = inventory.GetSlot((Vector2Int)slotElement.dataSource);
 
         if (slot != null && !slot.IsEmpty())
@@ -14,22 +20,57 @@ public class NewMonoBehaviourScript : MonoBehaviour
         }
     }
 
-    public void DraggedFrameFollowCursor(Inventory inventory, VisualElement slotElement, PointerMoveEvent evt)
+    public void DraggedFrameFollowCursor(InventoryInputMoveEventInfo evt)
     {
-        InventoryUI.UpdateCursorFramePosition(evt.position);
+        InventoryUI.UpdateCursorFramePosition(evt.PointerEvent.position);
     }
 
-    public void DropItem(Inventory inventory, VisualElement slotElement, PointerUpEvent evt)
+    public void DropItems(InventoryInputDownEventInfo evt)
     {
-        if (slotElement == null) return;
-        
-        Slot slot = inventory.GetSlot((Vector2Int)slotElement.dataSource);
+        Inventory inventory = evt.ContextInfo.BackendInventory;
+        VisualElement slotElement = evt.ContextInfo.SlotElement;
+        VisualElement root = evt.ContextInfo.GetVisualElementRoot();
+
+        if (slotElement == null)
+        {
+            slotElement = FindClosestSlot(evt.PointerEvent.position, root, evt.ContextInfo.SlotClassName);
+        }
+
+        Slot slot = null;
+
+        if(slotElement != null)
+        {
+            slot = inventory.GetSlot((Vector2Int)slotElement.dataSource);
+        }
 
         if (slot != null)
         {
-            inventory.SwapDraggedSlot((Vector2Int)slotElement.dataSource);
+            if(!inventory.MergeSlotWithDragged((Vector2Int)slotElement.dataSource))
+            {
+                inventory.SwapDraggedSlot((Vector2Int)slotElement.dataSource);
+            }
         }
 
-        ItemManipulator.isDragging = false;
+        ItemManipulator.isDragging = !inventory.DraggedSlot.IsEmpty();
+    }
+
+    private VisualElement FindClosestSlot(Vector2 pointerPosition, VisualElement root, string slotClassName = "itemSlot")
+    {
+        VisualElement closestSlot = null;
+        float closestDistance = float.MaxValue;
+
+        root.Query<VisualElement>(className: slotClassName).ForEach(slot =>
+        {
+            Vector2 slotPosition = slot.worldBound.center;
+            float distance = Vector2.Distance(pointerPosition, slotPosition);
+
+            if (distance < closestDistance && distance <= maxDistance)
+            {
+                closestDistance = distance;
+                closestSlot = slot;
+            }
+        });
+
+        return closestSlot;
     }
 }

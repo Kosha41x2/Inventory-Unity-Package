@@ -42,7 +42,7 @@ public class InventoryUI : MonoBehaviour
         root = GetComponent<UIDocument>().rootVisualElement;
 
         if (root == null || uiSettings == null) return;
-        
+
         inventoryPanel = root.Q<VisualElement>(uiSettings.inventoryPanelName);
         inventory.OnInventorySizeChanged += BuildInventory;
         inventory.OnInventoryContentChanged += UpdateInventoryContent;

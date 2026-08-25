@@ -7,8 +7,6 @@ using System.Collections.Generic;
 /// </summary>
 public class ItemManipulator : PointerManipulator
 {
-    private VisualElement originalSlot;
-    
     private Inventory backendInventory;
 
     private string slotClassName;
@@ -70,7 +68,9 @@ public class ItemManipulator : PointerManipulator
                  (evt.modifiers & binding.requiredModifier) == binding.requiredModifier)
                   && (binding.whileDragging == isDragging))
             {
-                binding.action?.Invoke(backendInventory, GetTargetSlot(target.panel.Pick(evt.position)), evt);
+                binding.action?.Invoke(new InventoryInputUpEventInfo(evt,
+                 new InventoryInputEventInfo(backendInventory,
+                 GetTargetSlot(target.panel.Pick(evt.position)), target)));
             }
         }
     }
@@ -81,17 +81,28 @@ public class ItemManipulator : PointerManipulator
     /// <param name="evt">The pointer down event data.</param>
     private void OnPointerDown(PointerDownEvent evt)
     {
+        bool isDraggingTemp = isDragging; // Store the current dragging state for the execution order not to affect the action bindings.
         for(int i = 0; i < slotDownActionBindings.Count; i++)
         {
             var binding = slotDownActionBindings[i];
             if (binding.requiredButton == (MouseButton)evt.button && 
                 (binding.requiredModifier == EventModifiers.None || 
                  (evt.modifiers & binding.requiredModifier) == binding.requiredModifier)
-                  && (binding.whileDragging == isDragging))
+                  && (binding.whileDragging == isDraggingTemp))
             {
-                binding.action?.Invoke(backendInventory, GetTargetSlot(target.panel.Pick(evt.position)), evt);
+                binding.action?.Invoke(new InventoryInputDownEventInfo(evt,
+                 new InventoryInputEventInfo(backendInventory,
+                  GetTargetSlot(target.panel.Pick(evt.position)), target, slotClassName)));
             }
-        } 
+        }
+
+        if (isDragging)
+        {
+            target.panel.visualTree.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+        }
+        
+        target.panel.visualTree.UnregisterCallback<PointerDownEvent>(OnPointerDown);
+        target.panel.visualTree.RegisterCallback<PointerUpEvent>(OnPointerUp);
    }
 
 
@@ -108,9 +119,11 @@ public class ItemManipulator : PointerManipulator
                  (evt.modifiers & binding.requiredModifier) == binding.requiredModifier)
                   && (binding.whileDragging == isDragging))
             {
-                binding.action?.Invoke(backendInventory, GetTargetSlot(target.panel.Pick(evt.position)), evt);
+                binding.action?.Invoke(new InventoryInputMoveEventInfo(evt,
+                 new InventoryInputEventInfo(backendInventory,
+                  GetTargetSlot(target.panel.Pick(evt.position)), target, slotClassName)));
             }
-        } 
+        }
     }
 
     /// <summary>
@@ -129,6 +142,15 @@ public class ItemManipulator : PointerManipulator
             }
             current = current.parent;
         }
+
+        if(!isDragging)
+        {
+            target.panel.visualTree.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
+        }
+
+        target.panel.visualTree.UnregisterCallback<PointerUpEvent>(OnPointerUp);
+        target.panel.visualTree.RegisterCallback<PointerDownEvent>(OnPointerDown);
+
         return null;
     }
 }

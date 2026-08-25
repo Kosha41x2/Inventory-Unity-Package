@@ -3,13 +3,16 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [System.Serializable]
-public class SlotDownEvent : UnityEvent<Inventory, VisualElement, PointerDownEvent> { }
+[Tooltip("A binding that associates a specific pointer action (down) with a UnityEvent.")]
+public class SlotDownEvent : UnityEvent<InventoryInputDownEventInfo> { }
 
 [System.Serializable]
-public class SlotMoveEvent : UnityEvent<Inventory, VisualElement, PointerMoveEvent> { }
+[Tooltip("A binding that associates a specific pointer action (move) with a UnityEvent.")]
+public class SlotMoveEvent : UnityEvent<InventoryInputMoveEventInfo> { }
 
 [System.Serializable]
-public class SlotUpEvent : UnityEvent<Inventory, VisualElement, PointerUpEvent> { }
+[Tooltip("A binding that associates a specific pointer action (up) with a UnityEvent.")]
+public class SlotUpEvent : UnityEvent<InventoryInputUpEventInfo> { }
 
 [System.Serializable]
 public class SlotActionBindingBase
