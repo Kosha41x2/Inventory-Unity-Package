@@ -51,6 +51,6 @@ public class InputLeftClickActions : MonoBehaviour
             }
         }
 
-        ItemManipulator.isDragging = !inventory.DraggedSlot.IsEmpty();
+        ItemManipulator.isDragging = !Inventory.DraggedSlot.IsEmpty();
     }
 }

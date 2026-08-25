@@ -14,9 +14,9 @@ public class Inventory : MonoBehaviour
 
     private Slot[,] slots;
 
-    private Slot draggedSlot;
+    private static Slot draggedSlot;
 
-    public Slot DraggedSlot => draggedSlot;
+    public static Slot DraggedSlot => draggedSlot;
 
     public event Action<Inventory> OnInventorySizeChanged;
     public event Action<Inventory> OnInventoryContentChanged;

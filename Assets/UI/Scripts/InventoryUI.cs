@@ -155,7 +155,7 @@ public class InventoryUI : MonoBehaviour
             if (cursorFrame == null) return; 
         }
 
-        Slot draggedSlot = inv.DraggedSlot;
+        Slot draggedSlot = Inventory.DraggedSlot;
 
         if (draggedSlot == null || draggedSlot.IsEmpty() || draggedSlot.CurrentItem == null)
         {
