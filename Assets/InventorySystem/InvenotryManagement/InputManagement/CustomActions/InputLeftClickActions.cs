@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
-public class InputActions : MonoBehaviour
+public class InputLeftClickActions : MonoBehaviour
 {
     [SerializeField] private float maxDistance = 100f;
     public void SwapItems(InventoryInputDownEventInfo evt)
@@ -8,13 +8,13 @@ public class InputActions : MonoBehaviour
         if (!evt.ContextInfo.HasSlotBeenClicked()) return;
 
         Inventory inventory = evt.ContextInfo.BackendInventory;
-        VisualElement slotElement = evt.ContextInfo.SlotElement;
+        VisualElement slotElement = evt.ContextInfo.ClickedSlot;
 
         Slot slot = inventory.GetSlot((Vector2Int)slotElement.dataSource);
 
         if (slot != null && !slot.IsEmpty())
         {
-            InventoryUI.AdjustCursorFrame(slotElement);
+            InventoryUI.AdjustCursorFrame(slotElement); // Needed just to adjust the cursor frame dimensions when starting to drag.
             inventory.SwapDraggedSlot((Vector2Int)slotElement.dataSource);
             ItemManipulator.isDragging = true;
         }
@@ -28,12 +28,12 @@ public class InputActions : MonoBehaviour
     public void DropItems(InventoryInputDownEventInfo evt)
     {
         Inventory inventory = evt.ContextInfo.BackendInventory;
-        VisualElement slotElement = evt.ContextInfo.SlotElement;
+        VisualElement slotElement = evt.ContextInfo.ClickedSlot;
         VisualElement root = evt.ContextInfo.GetVisualElementRoot();
 
         if (slotElement == null)
         {
-            slotElement = FindClosestSlot(evt.PointerEvent.position, root, evt.ContextInfo.SlotClassName);
+            slotElement = AuxiliarInventoryInputFunc.FindClosestSlot(evt.PointerEvent.position, root, maxDistance, evt.ContextInfo.SlotClassName);
         }
 
         Slot slot = null;
@@ -52,25 +52,5 @@ public class InputActions : MonoBehaviour
         }
 
         ItemManipulator.isDragging = !inventory.DraggedSlot.IsEmpty();
-    }
-
-    private VisualElement FindClosestSlot(Vector2 pointerPosition, VisualElement root, string slotClassName = "itemSlot")
-    {
-        VisualElement closestSlot = null;
-        float closestDistance = float.MaxValue;
-
-        root.Query<VisualElement>(className: slotClassName).ForEach(slot =>
-        {
-            Vector2 slotPosition = slot.worldBound.center;
-            float distance = Vector2.Distance(pointerPosition, slotPosition);
-
-            if (distance < closestDistance && distance <= maxDistance)
-            {
-                closestDistance = distance;
-                closestSlot = slot;
-            }
-        });
-
-        return closestSlot;
     }
 }

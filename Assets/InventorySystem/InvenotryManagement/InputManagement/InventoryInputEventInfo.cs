@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 public class InventoryInputEventInfo
 {
     public Inventory BackendInventory { get; private set; }
-    public VisualElement SlotElement { get; private set; }
+    public VisualElement ClickedSlot { get; private set; }
     public VisualElement Target { get; private set; }
 
     public string SlotClassName { get; private set; }
@@ -11,7 +11,7 @@ public class InventoryInputEventInfo
     public InventoryInputEventInfo(Inventory backendInventory, VisualElement slotElement, VisualElement target, string slotClassName = "itemSlot")
     {
         BackendInventory = backendInventory;
-        SlotElement = slotElement;
+        ClickedSlot = slotElement;
         Target = target;
         SlotClassName = slotClassName;
     }
@@ -23,17 +23,17 @@ public class InventoryInputEventInfo
 
     public bool HasSlotBeenClicked()
     {
-        return SlotElement != null;
+        return ClickedSlot != null;
     }
 
     public Slot GetLogicalSlot()
     {
-        if (SlotElement == null)
+        if (ClickedSlot == null)
         {
             return null;
         }
 
-        return BackendInventory.GetSlot((Vector2Int)SlotElement.dataSource);
+        return BackendInventory.GetSlot((Vector2Int)ClickedSlot.dataSource);
     }
 }
 

@@ -118,6 +118,7 @@ public class Slot
         otherSlot.ClearSlot();
 
         otherSlot.AddItem(this.CurrentItem, remainingAmount);
+
         return true;
     }
 }

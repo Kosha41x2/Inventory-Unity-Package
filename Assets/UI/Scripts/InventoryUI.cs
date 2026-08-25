@@ -41,13 +41,15 @@ public class InventoryUI : MonoBehaviour
     {
         root = GetComponent<UIDocument>().rootVisualElement;
 
-        if (root == null || uiSettings == null) return;
+        if (root == null || uiSettings == null || inventory == null) return;
 
         inventoryPanel = root.Q<VisualElement>(uiSettings.inventoryPanelName);
         inventory.OnInventorySizeChanged += BuildInventory;
         inventory.OnInventoryContentChanged += UpdateInventoryContent;
         inventory.OnSlotContentChanged += UpdateSlot;
         inventory.OnDraggedSlotContentChanged += UpdateDraggedSlotVisuals;
+
+        BuildInventory(inventory);
     }
 
     void OnDisable()
