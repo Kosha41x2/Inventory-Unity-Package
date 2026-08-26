@@ -26,13 +26,8 @@ public class InventoryInputEventInfo
 
     public Slot GetLogicalSlot()
     {
-        if (!HasSlotBeenClicked())
-        {
-            return null;
-        }
-
+        if (!HasSlotBeenClicked()) return null;
         SlotDirection slotDirection = (SlotDirection)ClickedSlot.dataSource;
-
         return slotDirection.Inventory.GetSlot(slotDirection.Position);
     }
 }
