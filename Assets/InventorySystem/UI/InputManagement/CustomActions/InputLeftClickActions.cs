@@ -7,15 +7,15 @@ public class InputLeftClickActions : MonoBehaviour
     {
         if (!evt.ContextInfo.HasSlotBeenClicked()) return;
 
-        Inventory inventory = evt.ContextInfo.BackendInventory;
+        SlotDirection slotDirection = (SlotDirection)evt.ContextInfo.ClickedSlot.dataSource;
         VisualElement slotElement = evt.ContextInfo.ClickedSlot;
 
-        Slot slot = inventory.GetSlot((Vector2Int)slotElement.dataSource);
+        Slot slot = slotDirection.Inventory.GetSlot(slotDirection.Position);
 
         if (slot != null && !slot.IsEmpty())
         {
             InventoryUI.AdjustCursorFrame(slotElement); // Needed just to adjust the cursor frame dimensions when starting to drag.
-            inventory.SwapDraggedSlot((Vector2Int)slotElement.dataSource);
+            slotDirection.Inventory.SwapDraggedSlot(slotDirection.Position);
             ItemManipulator.isDragging = true;
         }
     }
@@ -27,7 +27,6 @@ public class InputLeftClickActions : MonoBehaviour
 
     public void DropItems(InventoryInputDownEventInfo evt)
     {
-        Inventory inventory = evt.ContextInfo.BackendInventory;
         VisualElement slotElement = evt.ContextInfo.ClickedSlot;
         VisualElement root = evt.ContextInfo.GetVisualElementRoot();
 
@@ -36,18 +35,23 @@ public class InputLeftClickActions : MonoBehaviour
             slotElement = AuxiliarInventoryInputFunc.FindClosestSlot(evt.PointerEvent.position, root, maxDistance, evt.ContextInfo.SlotClassName);
         }
 
+        SlotDirection slotDirection = new SlotDirection(Vector2Int.zero, null);
+
         Slot slot = null;
 
         if(slotElement != null)
         {
-            slot = inventory.GetSlot((Vector2Int)slotElement.dataSource);
+            slotDirection = (SlotDirection)slotElement.dataSource;
+            if(slotDirection.Inventory != null){
+                slot = slotDirection.Inventory.GetSlot(slotDirection.Position);
+            }
         }
 
         if (slot != null)
         {
-            if(!inventory.MergeSlotWithDragged((Vector2Int)slotElement.dataSource))
+            if(!slotDirection.Inventory.MergeSlotWithDragged(slotDirection.Position))
             {
-                inventory.SwapDraggedSlot((Vector2Int)slotElement.dataSource);
+                slotDirection.Inventory.SwapDraggedSlot(slotDirection.Position);
             }
         }
 

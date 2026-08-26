@@ -2,15 +2,13 @@ using UnityEngine;
 using UnityEngine.UIElements;
 public class InventoryInputEventInfo
 {
-    public Inventory BackendInventory { get; private set; }
     public VisualElement ClickedSlot { get; private set; }
     public VisualElement Target { get; private set; }
 
     public string SlotClassName { get; private set; }
 
-    public InventoryInputEventInfo(Inventory backendInventory, VisualElement slotElement, VisualElement target, string slotClassName = "itemSlot")
+    public InventoryInputEventInfo(VisualElement slotElement, VisualElement target, string slotClassName = "itemSlot")
     {
-        BackendInventory = backendInventory;
         ClickedSlot = slotElement;
         Target = target;
         SlotClassName = slotClassName;
@@ -28,12 +26,14 @@ public class InventoryInputEventInfo
 
     public Slot GetLogicalSlot()
     {
-        if (ClickedSlot == null)
+        if (!HasSlotBeenClicked())
         {
             return null;
         }
 
-        return BackendInventory.GetSlot((Vector2Int)ClickedSlot.dataSource);
+        SlotDirection slotDirection = (SlotDirection)ClickedSlot.dataSource;
+
+        return slotDirection.Inventory.GetSlot(slotDirection.Position);
     }
 }
 

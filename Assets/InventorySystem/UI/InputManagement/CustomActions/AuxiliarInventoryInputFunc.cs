@@ -18,16 +18,50 @@ public static class AuxiliarInventoryInputFunc
 
         root.Query<VisualElement>(className: slotClassName).ForEach(slot =>
         {
-            Vector2 slotPosition = slot.worldBound.center;
-            float distance = Vector2.Distance(pointerPosition, slotPosition);
-
-            if (distance < closestDistance && distance <= maxDistance)
+            if(IsElementVisibleAndUnclipped(slot))
             {
-                closestDistance = distance;
-                closestSlot = slot;
+                Vector2 slotPosition = root.WorldToLocal(slot.worldBound.center);
+                float distance = Vector2.Distance(pointerPosition, slotPosition);
+
+                if (distance < closestDistance && distance <= maxDistance)
+                {
+                    closestDistance = distance;
+                    closestSlot = slot;
+                }
             }
         });
 
         return closestSlot;
+    }
+
+    /// <summary>
+    /// Checks if a VisualElement is visible and not clipped by any of its parent elements, including ScrollViews.
+    /// </summary>
+    private static bool IsElementVisibleAndUnclipped(VisualElement element)
+    {
+        if (element.resolvedStyle.display == DisplayStyle.None || 
+            element.resolvedStyle.visibility == Visibility.Hidden)
+        {
+            return false;
+        }
+
+        Vector2 elementCenter = element.worldBound.center;
+        VisualElement currentParent = element.parent;
+
+        while (currentParent != null)
+        {
+            // If the parent is a ScrollView or has a class indicating it's a scroll view content viewport, check if the element's center is within its bounds.
+            if (currentParent is ScrollView || currentParent.ClassListContains("unity-scroll-view__content-viewport"))
+            {
+                // If the center of the slot is outside the bounds of the ScrollView, it's hidden
+                if (!currentParent.worldBound.Contains(elementCenter))
+                {
+                    return false;
+                }
+            }
+            currentParent = currentParent.parent;
+        }
+
+        return true;
     }
 }

@@ -114,7 +114,7 @@ public class InventoryUI : MonoBehaviour
                 itemFrame.name = itemFrameName;
                 itemFrame.AddToClassList(uiSettings.itemFrameClassName);
 
-                itemFrame.AddManipulator(new ItemManipulator(inventory, slotDownActionBindings, slotUpActionBindings, slotMoveActionBindings, uiSettings.itemSlotClassName));
+                itemFrame.AddManipulator(new ItemManipulator(slotDownActionBindings, slotUpActionBindings, slotMoveActionBindings, uiSettings.itemSlotClassName));
 
                 slot.Add(itemFrame);
 
@@ -202,7 +202,7 @@ public class InventoryUI : MonoBehaviour
         VisualElement slot = inventoryPanel.Q<VisualElement>($"Slot {position.x}_{position.y}");
         if(slot == null) return;
 
-        slot.dataSource = position;
+        slot.dataSource = new SlotDirection(position, inventory);
         VisualElement itemFrame = slot.Q<VisualElement>($"ItemFrame {position.x}_{position.y}");
         Label stackSizeLabel = itemFrame.Q<Label>($"StackSize {position.x}_{position.y}");
 

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 /// </summary>
 public class ItemManipulator : PointerManipulator
 {
-    private Inventory backendInventory;
 
     private string slotClassName;
 
@@ -21,17 +20,16 @@ public class ItemManipulator : PointerManipulator
     /// </summary>
     /// <param name="inventory">The backend inventory reference.</param>
     /// <param name="slotActionBindings">The list of slot action bindings.</param>
-    public ItemManipulator(Inventory inventory,
+    public ItemManipulator(
         List<SlotDownBinding> slotDownActionBindings,
         List<SlotUpBinding> slotUpActionBindings,
         List<SlotMoveBinding> slotMoveActionBindings,
-        string slotCassName)
+        string slotClassName)
     {
-        this.backendInventory = inventory;
         this.slotDownActionBindings = slotDownActionBindings;
         this.slotUpActionBindings = slotUpActionBindings;
         this.slotMoveActionBindings = slotMoveActionBindings;
-        this.slotClassName = slotCassName;
+        this.slotClassName = slotClassName;
     }
     
     /// <summary>
@@ -71,8 +69,10 @@ public class ItemManipulator : PointerManipulator
                   && (binding.whileDragging == isDraggingTemp))
             {
                 binding.action?.Invoke(new InventoryInputUpEventInfo(evt,
-                 new InventoryInputEventInfo(backendInventory,
-                 GetTargetSlot(target.panel.Pick(evt.position)), target, slotClassName)));
+                 new InventoryInputEventInfo(
+                    GetTargetSlot(target.panel.Pick(evt.position)),
+                    target,
+                    slotClassName)));
                 executed = true;
             }
         }
@@ -102,8 +102,10 @@ public class ItemManipulator : PointerManipulator
                   && (binding.whileDragging == isDraggingTemp))
             {
                 binding.action?.Invoke(new InventoryInputDownEventInfo(evt,
-                 new InventoryInputEventInfo(backendInventory,
-                  GetTargetSlot(target.panel.Pick(evt.position)), target, slotClassName)));
+                 new InventoryInputEventInfo(
+                    GetTargetSlot(target.panel.Pick(evt.position)),
+                    target,
+                    slotClassName)));
                 executed = true;
             }
         }
@@ -132,8 +134,10 @@ public class ItemManipulator : PointerManipulator
                   && (binding.whileDragging == isDraggingTemp))
             {
                 binding.action?.Invoke(new InventoryInputMoveEventInfo(evt,
-                 new InventoryInputEventInfo(backendInventory,
-                  GetTargetSlot(target.panel.Pick(evt.position)), target, slotClassName)));
+                 new InventoryInputEventInfo(
+                    GetTargetSlot(target.panel.Pick(evt.position)),
+                    target,
+                    slotClassName)));
             }
         }
         UpdateGlobalSubscriptions(isDraggingTemp);
@@ -149,7 +153,7 @@ public class ItemManipulator : PointerManipulator
         VisualElement current = elementUnderPointer;
         while (current != null)
         {
-            if (current.ClassListContains(slotClassName) && current.dataSource is Vector2Int pos)
+            if (current.ClassListContains(slotClassName) && current.dataSource is SlotDirection)
             {
                 return current;
             }
