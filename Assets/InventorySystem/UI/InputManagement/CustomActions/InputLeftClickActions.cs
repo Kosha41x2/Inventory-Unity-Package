@@ -7,10 +7,10 @@ public class InputLeftClickActions : MonoBehaviour
     {
         if (!evt.ContextInfo.HasSlotBeenClicked()) return;
 
-        SlotDirection slotDirection = (SlotDirection)evt.ContextInfo.ClickedSlot.dataSource;
+        SlotDirection slotDirection = evt.ContextInfo.GetSlotDirection();
         VisualElement slotElement = evt.ContextInfo.ClickedSlot;
 
-        Slot slot = slotDirection.Inventory.GetSlot(slotDirection.Position);
+        Slot slot = evt.ContextInfo.GetLogicalSlot();
 
         if (slot != null && !slot.IsEmpty())
         {

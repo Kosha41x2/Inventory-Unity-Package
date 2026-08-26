@@ -14,21 +14,72 @@ public class InventoryInputEventInfo
         SlotClassName = slotClassName;
     }
 
+    /// <summary>
+    /// Gets the root visual element of the target.
+    /// </summary>
+    /// <returns>The root visual element of the target.</returns>
     public VisualElement GetVisualElementRoot()
     {
         return Target.panel.visualTree;
     }
 
+    /// <summary>
+    /// Checks if a slot has been clicked.
+    /// </summary>
+    /// <returns></returns>
     public bool HasSlotBeenClicked()
     {
         return ClickedSlot != null;
     }
 
+    /// <summary>
+    /// Gets the logical slot associated with the clicked slot.
+    /// </summary>
+    /// <returns></returns>
     public Slot GetLogicalSlot()
     {
         if (!HasSlotBeenClicked()) return null;
         SlotDirection slotDirection = (SlotDirection)ClickedSlot.dataSource;
         return slotDirection.Inventory.GetSlot(slotDirection.Position);
+    }
+
+    /// <summary>
+    /// Gets the backend inventory associated with the clicked slot.
+    /// if no slot has been clicked, returns null.
+    /// So it's recommended to check if a slot has been clicked before or
+    /// to get first the SlotDirection and then get the inventory from it.
+    /// </summary>
+    /// <returns></returns>
+    public Inventory GetBackendInventory()
+    {
+        if (!HasSlotBeenClicked()) return null;
+        SlotDirection slotDirection = (SlotDirection)ClickedSlot.dataSource;
+        return slotDirection.Inventory;
+    }
+
+    /// <summary>
+    /// Gets the position of the clicked slot.
+    /// If no slot has been clicked, returns Vector2Int.zero.
+    /// So it's recommended to check if a slot has been clicked before or
+    /// to get first the SlotDirection and then get the position from it.
+    /// </summary>
+    /// <returns></returns>
+    public Vector2Int GetSlotPosition()
+    {
+        if (!HasSlotBeenClicked()) return Vector2Int.zero;
+        SlotDirection slotDirection = (SlotDirection)ClickedSlot.dataSource;
+        return slotDirection.Position;
+    }
+
+    /// <summary>
+    /// Gets the SlotDirection associated with the clicked slot.
+    /// If no slot has been clicked, returns a default SlotDirection with Vector2Int.zero and null inventory.
+    /// </summary>
+    /// <returns></returns>
+    public SlotDirection GetSlotDirection()
+    {
+        if (!HasSlotBeenClicked()) return new SlotDirection(Vector2Int.zero, null);
+        return (SlotDirection)ClickedSlot.dataSource;
     }
 }
 

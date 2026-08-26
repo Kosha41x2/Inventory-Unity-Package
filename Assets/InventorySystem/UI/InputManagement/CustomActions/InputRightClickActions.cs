@@ -14,7 +14,7 @@ public class InputRightClickActions : MonoBehaviour
         VisualElement slotElement = evt.ContextInfo.ClickedSlot;
         SlotDirection slotDirection = (SlotDirection)slotElement.dataSource;
 
-        Slot slot = slotDirection.Inventory.GetSlot(slotDirection.Position);
+        Slot slot = evt.ContextInfo.GetLogicalSlot();
 
         if (slot != null && !slot.IsEmpty())
         {
@@ -29,12 +29,12 @@ public class InputRightClickActions : MonoBehaviour
         VisualElement slotElement = evt.ContextInfo.ClickedSlot;
         VisualElement root = evt.ContextInfo.GetVisualElementRoot();
 
-        if (slotElement == null)
+        if (!evt.ContextInfo.HasSlotBeenClicked())
         {
             slotElement = AuxiliarInventoryInputFunc.FindClosestSlot(evt.PointerEvent.position, root, maxDistance, evt.ContextInfo.SlotClassName);
         }
 
-        SlotDirection slotDirection = (SlotDirection)evt.ContextInfo.ClickedSlot.dataSource;
+        SlotDirection slotDirection = (SlotDirection)slotElement.dataSource;
 
         Slot slot = null;
 
