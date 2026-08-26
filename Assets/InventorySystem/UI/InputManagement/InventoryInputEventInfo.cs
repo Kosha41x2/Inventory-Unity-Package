@@ -102,9 +102,12 @@ public class InventoryInputMoveEventInfo
 
     public InventoryInputEventInfo ContextInfo { get; private set; }
 
-    public InventoryInputMoveEventInfo(PointerMoveEvent pointerEvent, InventoryInputEventInfo contextInfo)
+    public float TimeBeingPressed { get; private set; }
+
+    public InventoryInputMoveEventInfo(PointerMoveEvent pointerEvent, float timeBeingPressed, InventoryInputEventInfo contextInfo)
     {
         PointerEvent = pointerEvent;
+        TimeBeingPressed = timeBeingPressed;
         ContextInfo = contextInfo;
     }
 }
@@ -115,9 +118,12 @@ public class InventoryInputMoveEventInfo
 
     public InventoryInputEventInfo ContextInfo { get; private set; }
 
-    public InventoryInputUpEventInfo(PointerUpEvent pointerEvent, InventoryInputEventInfo contextInfo)
+    public float TimeSincePointerDown { get; private set; }
+
+    public InventoryInputUpEventInfo(PointerUpEvent pointerEvent, float timeSincePointerDown, InventoryInputEventInfo contextInfo)
     {
         PointerEvent = pointerEvent;
+        TimeSincePointerDown = timeSincePointerDown;
         ContextInfo = contextInfo;
     }
 }

@@ -9,6 +9,7 @@ public class ItemManipulator : PointerManipulator
 {
 
     private string slotClassName;
+    private float timeWhenPointerDown;
 
     private List<SlotDownBinding> slotDownActionBindings = new List<SlotDownBinding>();
     private List<SlotUpBinding> slotUpActionBindings = new List<SlotUpBinding>();
@@ -60,6 +61,9 @@ public class ItemManipulator : PointerManipulator
     {
         bool executed = false;
         bool isDraggingTemp = isDragging; // Store the current dragging state for the execution order not to affect the action bindings.
+
+        float timeBeingPressed = (Time.unscaledTime - timeWhenPointerDown);
+
         for(int i = 0; i < slotUpActionBindings.Count; i++)
         {
             var binding = slotUpActionBindings[i];
@@ -69,6 +73,7 @@ public class ItemManipulator : PointerManipulator
                   && (binding.whileDragging == isDraggingTemp))
             {
                 binding.action?.Invoke(new InventoryInputUpEventInfo(evt,
+                 timeBeingPressed,
                  new InventoryInputEventInfo(
                     GetTargetSlot(target.panel.Pick(evt.position)),
                     target,
@@ -93,6 +98,8 @@ public class ItemManipulator : PointerManipulator
     {
         bool executed = false;
         bool isDraggingTemp = isDragging; // Store the current dragging state for the execution order not to affect the action bindings.
+        timeWhenPointerDown = Time.unscaledTime; // Record the time when the pointer is pressed down.
+
         for(int i = 0; i < slotDownActionBindings.Count; i++)
         {
             var binding = slotDownActionBindings[i];
@@ -126,6 +133,8 @@ public class ItemManipulator : PointerManipulator
    private void OnPointerMove(PointerMoveEvent evt)
    {
         bool isDraggingTemp = isDragging; // Store the current dragging state for the execution order not to affect the action bindings.
+        float timeBeingPressed = (Time.unscaledTime - timeWhenPointerDown);
+
         for(int i = 0; i < slotMoveActionBindings.Count; i++)
         {
             var binding = slotMoveActionBindings[i];
@@ -134,6 +143,7 @@ public class ItemManipulator : PointerManipulator
                   && (binding.whileDragging == isDraggingTemp))
             {
                 binding.action?.Invoke(new InventoryInputMoveEventInfo(evt,
+                 timeBeingPressed,
                  new InventoryInputEventInfo(
                     GetTargetSlot(target.panel.Pick(evt.position)),
                     target,

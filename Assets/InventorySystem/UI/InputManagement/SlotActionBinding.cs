@@ -41,6 +41,10 @@ public class SlotMoveBinding : SlotActionBindingBase
 [System.Serializable]
 public class SlotUpBinding : SlotActionBindingBase
 {
+    [Tooltip("The needed mouse button to trigger the action.")]
     public MouseButton requiredButton = MouseButton.LeftMouse;
+    
+    [Tooltip("The time threshold in seconds to trigger the action after the pointer is released.")]
+    public float timeThreshold = 0f;
     public SlotUpEvent action;
 }
