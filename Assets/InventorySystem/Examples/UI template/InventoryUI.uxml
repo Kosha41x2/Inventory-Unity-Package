@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/InventorySystem/Examples/UI%20template/USS/InventoryUI.uss?fileID=7433441132597879392&amp;guid=f6bc3dd8aba83eb41a77763c261891de&amp;type=3#InventoryUI"/>
+    <ui:VisualElement name="Background" class="Background background" style="flex-grow: 1;">
+        <ui:ScrollView horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" name="Inventory" __unity-builder-selected-element="selected" class="pannel"/>
+    </ui:VisualElement>
+</ui:UXML>
