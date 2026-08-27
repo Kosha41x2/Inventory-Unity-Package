@@ -1,13 +1,16 @@
 using UnityEngine;
 
-public struct SlotDirection
+namespace Kosha82.InventorySystem
 {
-    public Vector2Int Position;
-    public Inventory Inventory;
-
-    public SlotDirection(Vector2Int position, Inventory inventory)
+    public struct SlotDirection
     {
-        Position = position;
-        Inventory = inventory;
+        public Vector2Int Position;
+        public Inventory Inventory;
+
+        public SlotDirection(Vector2Int position, Inventory inventory)
+        {
+            Position = position;
+            Inventory = inventory;
+        }
     }
 }

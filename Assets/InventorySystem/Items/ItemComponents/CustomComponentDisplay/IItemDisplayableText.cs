@@ -1,7 +1,10 @@
 using UnityEngine;
 
-public interface IItemDisplayableText
+namespace Kosha82.InventorySystem
 {
-    string GetInInventoryDisplayText();
-    string GetInInventoryDisplayTag();
+    public interface IItemDisplayableText
+    {
+        string GetInInventoryDisplayText();
+        string GetInInventoryDisplayTag();
+    }
 }

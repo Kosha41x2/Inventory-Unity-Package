@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using Kosha82.InventorySystem;
 
 public class Test: MonoBehaviour
 {

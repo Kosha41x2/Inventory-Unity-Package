@@ -1,56 +1,59 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class InputRightClickActions : MonoBehaviour
+namespace Kosha82.InventorySystem.Examples
 {
-    [SerializeField] private float maxDistance = 100f;
-    [SerializeField] private int amount = 1;
-
-    public void GetSomeItems(InventoryInputDownEventInfo evt)
+    public class InputRightClickActions : MonoBehaviour
     {
-        if (!evt.ContextInfo.HasSlotBeenClicked()) return;
+        [SerializeField] private float maxDistance = 100f;
+        [SerializeField] private int amount = 1;
 
-
-        VisualElement slotElement = evt.ContextInfo.ClickedSlot;
-        SlotDirection slotDirection = (SlotDirection)slotElement.dataSource;
-
-        Slot slot = evt.ContextInfo.GetLogicalSlot();
-
-        if (slot != null && !slot.IsEmpty())
+        public void GetSomeItems(InventoryInputDownEventInfo evt)
         {
-            InventoryUI.AdjustCursorFrame(slotElement);
-            slotDirection.Inventory.TransferFromSlotToDragged(slotDirection.Position, amount);
-            ItemManipulator.isDragging = true;
-        }
-    }
+            if (!evt.ContextInfo.HasSlotBeenClicked()) return;
 
-    public void DropSomeItems(InventoryInputDownEventInfo evt)
-    {
-        VisualElement slotElement = evt.ContextInfo.ClickedSlot;
-        VisualElement root = evt.ContextInfo.GetVisualElementRoot();
 
-        if (!evt.ContextInfo.HasSlotBeenClicked())
-        {
-            slotElement = AuxiliarInventoryInputFunc.FindClosestSlot(evt.PointerEvent.position, root, maxDistance, evt.ContextInfo.SlotClassName);
-        }
+            VisualElement slotElement = evt.ContextInfo.ClickedSlot;
+            SlotDirection slotDirection = (SlotDirection)slotElement.dataSource;
 
-        SlotDirection slotDirection = (SlotDirection)slotElement.dataSource;
+            Slot slot = evt.ContextInfo.GetLogicalSlot();
 
-        Slot slot = null;
-
-        if(slotElement != null)
-        {
-            slot = slotDirection.Inventory.GetSlot(slotDirection.Position);
-        }
-
-        if (slot != null)
-        {
-            if(!slotDirection.Inventory.TransferFromDraggedToSlot(slotDirection.Position, amount))
+            if (slot != null && !slot.IsEmpty())
             {
-                slotDirection.Inventory.SwapDraggedSlot(slotDirection.Position);
+                InventoryUI.AdjustCursorFrame(slotElement);
+                slotDirection.Inventory.TransferFromSlotToDragged(slotDirection.Position, amount);
+                ItemManipulator.isDragging = true;
             }
         }
 
-        ItemManipulator.isDragging = !Inventory.DraggedSlot.IsEmpty();
+        public void DropSomeItems(InventoryInputDownEventInfo evt)
+        {
+            VisualElement slotElement = evt.ContextInfo.ClickedSlot;
+            VisualElement root = evt.ContextInfo.GetVisualElementRoot();
+
+            if (!evt.ContextInfo.HasSlotBeenClicked())
+            {
+                slotElement = AuxiliarInventoryInputFunc.FindClosestSlot(evt.PointerEvent.position, root, maxDistance, evt.ContextInfo.SlotClassName);
+            }
+
+            SlotDirection slotDirection = (SlotDirection)slotElement.dataSource;
+
+            Slot slot = null;
+
+            if (slotElement != null)
+            {
+                slot = slotDirection.Inventory.GetSlot(slotDirection.Position);
+            }
+
+            if (slot != null)
+            {
+                if (!slotDirection.Inventory.TransferFromDraggedToSlot(slotDirection.Position, amount))
+                {
+                    slotDirection.Inventory.SwapDraggedSlot(slotDirection.Position);
+                }
+            }
+
+            ItemManipulator.isDragging = !Inventory.DraggedSlot.IsEmpty();
+        }
     }
 }
