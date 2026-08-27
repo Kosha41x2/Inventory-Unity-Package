@@ -30,4 +30,43 @@ public class Item : ScriptableObject
         }
         return null;
     }
+
+    public List<T> getComponents<T>() where T : ItemComponent
+    {
+        List<T> components = new List<T>();
+        foreach (var component in itemComponents)
+        {
+            if (component is T typedComponent)
+            {
+                components.Add(typedComponent);
+            }
+        }
+        return components;
+    }
+
+    public List<IItemDisplayableImage> GetDisplayableImageComponents()
+    {
+        List<IItemDisplayableImage> displayableImageComponents = new List<IItemDisplayableImage>();
+        foreach (var component in itemComponents)
+        {
+            if (component is IItemDisplayableImage displayableImageComponent)
+            {
+                displayableImageComponents.Add(displayableImageComponent);
+            }
+        }
+        return displayableImageComponents;
+    }
+
+    public List<IItemDisplayableText> GetDisplayableTextComponents()
+    {
+        List<IItemDisplayableText> displayableTextComponents = new List<IItemDisplayableText>();
+        foreach (var component in itemComponents)
+        {
+            if (component is IItemDisplayableText displayableTextComponent)
+            {
+                displayableTextComponents.Add(displayableTextComponent);
+            }
+        }
+        return displayableTextComponents;
+    }
 }

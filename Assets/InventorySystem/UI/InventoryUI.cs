@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
-using System.Linq;
 
 [ExecuteAlways]
 [AddComponentMenu("Inventory System/UI/Inventory UI")]
@@ -9,6 +8,8 @@ public class InventoryUI : MonoBehaviour
 {
     private VisualElement root;
     private VisualElement inventoryPanel;
+
+    private Dictionary<string, string> componentStyleMappingDict = new Dictionary<string, string>();
 
     private static VisualElement cursorFrame;
     private static Label cursorStackLabel;
@@ -50,6 +51,7 @@ public class InventoryUI : MonoBehaviour
         inventory.OnDraggedSlotContentChanged += UpdateDraggedSlotVisuals;
 
         BuildInventory(inventory);
+        InitializeComponentStyleMappingDict();
     }
 
     void OnDisable()
@@ -125,6 +127,27 @@ public class InventoryUI : MonoBehaviour
                 stackSizeLabel.name = stackSizeName;
                 stackSizeLabel.AddToClassList(uiSettings.stackSizeLabelClassName);
                 itemFrame.Add(stackSizeLabel);
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Initializes the component style mapping dictionary based on the provided component style mappings in the UI settings. This dictionary is used to map component tags to their corresponding style classes for customizing the appearance of item components in the inventory UI. If duplicate tags are found, a warning is logged, and only the first occurrence is used.
+    /// </summary>
+    private void InitializeComponentStyleMappingDict()
+    {
+        componentStyleMappingDict.Clear();
+        foreach (var mapping in uiSettings.componentStyleMappings)
+        {
+            if(mapping == null) continue;
+            if (!componentStyleMappingDict.ContainsKey(mapping.tag))
+            {
+                componentStyleMappingDict.Add(mapping.tag, mapping.styleClass);
+            }
+            else
+            {
+                Debug.LogWarning($"Duplicate tag '{mapping.tag}' found in component style mappings. Only the first occurrence will be used.");
             }
         }
     }
@@ -235,6 +258,8 @@ public class InventoryUI : MonoBehaviour
             itemFrame.Add(stackSizeLabel);
         }
 
+        ResetComponentStyles(itemFrame);
+
         if(slotData.IsEmpty())
         {
             itemFrame.style.backgroundImage = new StyleBackground();
@@ -245,6 +270,109 @@ public class InventoryUI : MonoBehaviour
             itemFrame.style.backgroundImage = new StyleBackground(slotData.CurrentItem.ItemIcon);
             stackSizeLabel.text = slotData.CurrentAmount.ToString();
         }
+
+        UpdateComponentStyles(slotData, itemFrame);
+    }
+
+    private void UpdateComponentTextStyles(Slot slotData, VisualElement itemFrame)
+    {
+        if (itemFrame == null || slotData == null) return;
+        if (slotData.IsEmpty()) return;
+
+        slotData.CurrentItem.GetDisplayableTextComponents().ForEach(component =>
+        {
+            if(componentStyleMappingDict.TryGetValue(component.GetInInventoryDisplayTag(), out string styleClass))
+            {
+                Label label = itemFrame.Q<Label>(className: styleClass);
+                if(label == null)
+                {
+                    label = CreateComponentLabel(itemFrame, styleClass);
+                }
+                label.visible = true;
+                label.text = component.GetInInventoryDisplayText();
+            }
+        });
+    }
+
+
+    private Label CreateComponentLabel(VisualElement itemFrame, string styleClass)
+    {
+        Label label = new Label();
+        label.AddToClassList(styleClass);
+        label.name = $"Label {itemFrame.name} {styleClass}";
+        itemFrame.Add(label);
+        return label;
+    }
+
+    private void UpdateComponentImageStyles(Slot slotData, VisualElement itemFrame)
+    {
+        if (itemFrame == null || slotData == null) return;
+        if (slotData.IsEmpty()) return;
+
+        slotData.CurrentItem.GetDisplayableImageComponents().ForEach(component =>
+        {
+            if(componentStyleMappingDict.TryGetValue(component.GetInInventoryDisplayTag(), out string styleClass))
+            {
+                VisualElement imageElement = itemFrame.Q<VisualElement>(className: styleClass);
+                if(imageElement == null)
+                {
+                    imageElement = CreateComponentImage(itemFrame, styleClass);
+                }
+                imageElement.visible = true;
+                imageElement.style.backgroundImage = new StyleBackground(component.GetInInventoryDisplayImage());
+            }
+        });
+    }
+
+    private VisualElement CreateComponentImage(VisualElement itemFrame, string styleClass)
+    {
+        VisualElement imageElement = new VisualElement();
+        imageElement.AddToClassList(styleClass);
+        imageElement.name = $"Image {itemFrame.name} {styleClass}";
+        itemFrame.Add(imageElement);
+        return imageElement;
+    }
+
+    private void UpdateComponentStyles(Slot slotData, VisualElement itemFrame)
+    {
+        UpdateComponentTextStyles(slotData, itemFrame);
+        UpdateComponentImageStyles(slotData, itemFrame);
+    }
+
+    private void ResetComponentTextStyles(VisualElement itemFrame)
+    {
+        if (itemFrame == null) return;
+
+        foreach (var mapping in componentStyleMappingDict)
+        {
+            itemFrame.Query<Label>(className: mapping.Value).ForEach(label =>
+            {
+                if(label == null) return;
+                label.visible = false;
+                label.text = string.Empty;
+            });
+        }
+    }
+
+    private void ResetComponentImageStyles(VisualElement itemFrame)
+    {
+        if (itemFrame == null) return;
+
+        foreach (var mapping in componentStyleMappingDict)
+        {
+            itemFrame.Query<VisualElement>(className: mapping.Value).ForEach(imageElement =>
+            {
+                if(imageElement == null) return;
+                imageElement.visible = false;
+                imageElement.style.backgroundImage = new StyleBackground((Texture2D)null);
+            });
+        }
+    }
+
+    private void ResetComponentStyles(VisualElement itemFrame)
+    {
+        ResetComponentTextStyles(itemFrame);
+        ResetComponentImageStyles(itemFrame);
     }
 
     /// <summary>

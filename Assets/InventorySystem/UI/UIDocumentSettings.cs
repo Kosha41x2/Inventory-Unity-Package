@@ -1,4 +1,15 @@
 using UnityEngine;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class ComponentStyleMapping
+{
+    [Tooltip("The tag of the component that this style mapping applies to.")]
+    public string tag;
+
+    [Tooltip("The style class to apply to the item component data when this component is present.")]
+    public string styleClass;
+}
 
 [System.Serializable]
 public class UIDocumentSettings
@@ -19,4 +30,9 @@ public class UIDocumentSettings
 
     [Tooltip("The name of the class that will be used for the stack size labels in the inventory UI (the labels that display the number of items in each slot), this class should be defined in the UI Document's USS file (Check given Assets/UI/USS/InventoryUI.uss for reference)")]
     public string stackSizeLabelClassName = "stackSize";
+
+    [Space(5)]
+
+    [Tooltip("A list of mappings from component tags to style classes for customizing the appearance of item components displayed in the inventory UI. (Use it if you have an item component that implements IItemDisplayableImage or IItemDisplayableText and you want to apply a specific style to it in the inventory UI, if a tag is not found the component won't be displayed in the inventory UI)")]
+    public List<ComponentStyleMapping> componentStyleMappings = new List<ComponentStyleMapping>();
 }
