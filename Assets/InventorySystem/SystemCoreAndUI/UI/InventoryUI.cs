@@ -13,9 +13,6 @@ namespace Kosha82.InventorySystem
 
         private Dictionary<string, string> componentStyleMappingDict = new Dictionary<string, string>();
 
-        private static VisualElement cursorFrame;
-        private static Label cursorStackLabel;
-
         [Header("Backend Connections")]
         [Tooltip("Drag an object with an Inventory component to this field. This will make this UI display the inventory of that object")]
         [SerializeField] private Inventory inventory;
@@ -38,8 +35,6 @@ namespace Kosha82.InventorySystem
         [SerializeField]
         private List<SlotMoveBinding> slotMoveActionBindings = new List<SlotMoveBinding>();
 
-        public static VisualElement CursorFrame => cursorFrame;
-        public static Label CursorStackLabel => cursorStackLabel;
         void OnEnable()
         {
             root = GetComponent<UIDocument>().rootVisualElement;
@@ -66,8 +61,6 @@ namespace Kosha82.InventorySystem
 
         void SetInventory(Inventory newInventory)
         {
-            InitializeCursorFrame();
-
             if (this.inventory != null)
             {
                 this.inventory.OnInventorySizeChanged -= BuildInventory;
@@ -91,7 +84,7 @@ namespace Kosha82.InventorySystem
         {
             inventoryPanel.Clear();
 
-            InitializeCursorFrame();
+            CursorFrameUI.InitializeCursorFrame(root, uiSettings);
 
             int rows = inventory.InventoryVerticalSize;
             int columns = inventory.InventoryHorizontalSize;
@@ -153,47 +146,9 @@ namespace Kosha82.InventorySystem
                 }
             }
         }
-
-        private void InitializeCursorFrame()
+        private void UpdateDraggedSlotVisuals()
         {
-            cursorFrame = new VisualElement();
-            cursorFrame.name = "CursorFrame";
-            cursorFrame.AddToClassList(uiSettings.itemFrameClassName);
-            cursorFrame.style.position = Position.Absolute;
-            cursorFrame.style.display = DisplayStyle.None;
-            cursorFrame.pickingMode = PickingMode.Ignore;
-
-            cursorStackLabel = new Label();
-            cursorStackLabel.AddToClassList(uiSettings.stackSizeLabelClassName);
-            cursorFrame.Add(cursorStackLabel);
-
-            root.Add(cursorFrame);
-        }
-
-        private void UpdateDraggedSlotVisuals(Inventory inv)
-        {
-            if (cursorFrame == null || cursorStackLabel == null)
-            {
-                Debug.LogWarning("Cursor frame or stack label is not initialized. Initializing now.");
-                InitializeCursorFrame();
-
-                if (cursorFrame == null) return;
-            }
-
-            Slot draggedSlot = Inventory.DraggedSlot;
-
-            if (draggedSlot == null || draggedSlot.IsEmpty() || draggedSlot.CurrentItem == null)
-            {
-                cursorFrame.style.display = DisplayStyle.None;
-                cursorFrame.style.backgroundImage = new StyleBackground();
-                cursorStackLabel.text = string.Empty;
-            }
-            else
-            {
-                cursorFrame.style.display = DisplayStyle.Flex;
-                cursorFrame.style.backgroundImage = new StyleBackground(draggedSlot.CurrentItem.ItemIcon);
-                cursorStackLabel.text = draggedSlot.CurrentAmount.ToString();
-            }
+            UpdateFrame(Inventory.DraggedSlot, CursorFrameUI.CursorFrame, CursorFrameUI.CursorFrameLabel);
         }
 
         /// <summary>
@@ -377,30 +332,6 @@ namespace Kosha82.InventorySystem
         {
             ResetComponentTextStyles(itemFrame);
             ResetComponentImageStyles(itemFrame);
-        }
-
-        /// <summary>
-        /// Adjusts the size of the cursor frame to match the size of the provided model visual element. This is typically used to ensure that the cursor frame visually matches the item being dragged or interacted with in the inventory UI.
-        /// Usually necessary when getting an item from a slot and dragging it, so the cursor frame matches the size of the item frame.
-        /// </summary>
-        /// <param name="model"></param>
-        public static void AdjustCursorFrame(VisualElement model)
-        {
-            cursorFrame.style.width = model.resolvedStyle.width;
-            cursorFrame.style.height = model.resolvedStyle.height;
-        }
-
-        /// <summary>
-        /// Updates the position of the cursor frame to follow the mouse cursor. The cursor frame is
-        /// centered on the cursor position, and its position is adjusted based on its width and height to ensure it remains centered.
-        /// </summary>
-        /// <param name="position"></param>
-        public static void UpdateCursorFramePosition(Vector2 position)
-        {
-            if (cursorFrame == null) return;
-
-            cursorFrame.style.left = position.x - cursorFrame.resolvedStyle.width / 2;
-            cursorFrame.style.top = position.y - cursorFrame.resolvedStyle.height / 2;
         }
     }
 }

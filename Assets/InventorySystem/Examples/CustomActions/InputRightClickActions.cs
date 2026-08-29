@@ -20,7 +20,8 @@ namespace Kosha82.InventorySystem.Examples
 
             if (slot != null && !slot.IsEmpty())
             {
-                InventoryUI.AdjustCursorFrame(slotElement);
+                CursorFrameUI.AdjustSizeToMatch(slotElement);
+                CursorFrameUI.UpdatePosition(evt.PointerEvent.position);
                 slotDirection.Inventory.TransferFromSlotToDragged(slotDirection.Position, amount);
                 ItemManipulator.isDragging = true;
             }

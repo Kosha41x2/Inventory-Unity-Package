@@ -17,7 +17,8 @@ namespace Kosha82.InventorySystem.Examples
 
             if (slot != null && !slot.IsEmpty())
             {
-                InventoryUI.AdjustCursorFrame(slotElement); // Needed just to adjust the cursor frame dimensions when starting to drag.
+                CursorFrameUI.AdjustSizeToMatch(slotElement); // Needed just to adjust the cursor frame dimensions when starting to drag.
+                CursorFrameUI.UpdatePosition(evt.PointerEvent.position);
                 slotDirection.Inventory.SwapDraggedSlot(slotDirection.Position);
                 ItemManipulator.isDragging = true;
             }
@@ -25,7 +26,7 @@ namespace Kosha82.InventorySystem.Examples
 
         public void DraggedFrameFollowCursor(InventoryInputMoveEventInfo evt)
         {
-            InventoryUI.UpdateCursorFramePosition(evt.PointerEvent.position);
+            CursorFrameUI.UpdatePosition(evt.PointerEvent.position);
         }
 
         public void DropItems(InventoryInputDownEventInfo evt)

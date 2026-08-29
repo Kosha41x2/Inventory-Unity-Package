@@ -31,7 +31,7 @@ namespace Kosha82.InventorySystem
 
         public event Action<Inventory, Vector2Int> OnSlotContentChanged;
 
-        public event Action<Inventory> OnDraggedSlotContentChanged;
+        public event Action OnDraggedSlotContentChanged;
 
         /// <summary>
         /// Initializes the inventory according to inventory dimentions. Creating the 2D slot matrix.
@@ -205,7 +205,7 @@ namespace Kosha82.InventorySystem
             }
 
             OnSlotContentChanged?.Invoke(this, posB);
-            OnDraggedSlotContentChanged?.Invoke(this);
+            OnDraggedSlotContentChanged?.Invoke();
         }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace Kosha82.InventorySystem
             if (merged)
             {
                 OnSlotContentChanged?.Invoke(this, targetPos);
-                OnDraggedSlotContentChanged?.Invoke(this);
+                OnDraggedSlotContentChanged?.Invoke();
             }
 
             return merged;
@@ -320,7 +320,7 @@ namespace Kosha82.InventorySystem
             if (draggedSlot != null)
             {
                 int remaining = draggedSlot.RemoveItem(amount);
-                OnDraggedSlotContentChanged?.Invoke(this);
+                OnDraggedSlotContentChanged?.Invoke();
                 return remaining;
             }
             return amount;
@@ -338,7 +338,7 @@ namespace Kosha82.InventorySystem
             if (draggedSlot != null)
             {
                 int remaining = draggedSlot.AddItem(item, amount);
-                OnDraggedSlotContentChanged?.Invoke(this);
+                OnDraggedSlotContentChanged?.Invoke();
                 return remaining;
             }
             return amount;
