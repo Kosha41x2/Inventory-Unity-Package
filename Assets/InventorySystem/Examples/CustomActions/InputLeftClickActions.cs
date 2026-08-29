@@ -6,7 +6,7 @@ namespace Kosha82.InventorySystem.Examples
     public class InputLeftClickActions : MonoBehaviour
     {
         [SerializeField] private float maxDistance = 100f;
-        public void SwapItems(InventoryInputDownEventInfo evt)
+        public void PickItems(InventoryInputDownEventInfo evt)
         {
             if (!evt.ContextInfo.HasSlotBeenClicked()) return;
 

@@ -5,6 +5,11 @@ using UnityEngine;
 namespace Kosha82.InventorySystem
 {
 
+    /// <summary>
+    /// Represents a matrix of slots that can hold items. It provides methods to control these slots,
+    /// all these methods will automatically trigger events that will update the linked inventory UI.
+    /// to link an inventory to an inventory UI, just drag this component to the inventory UI one or use the corresponding method in the inventory UI.
+    /// </summary>
     [ExecuteAlways]
     [AddComponentMenu("Inventory System/Core/Inventory Backend")]
     public class Inventory : MonoBehaviour
@@ -27,6 +32,13 @@ namespace Kosha82.InventorySystem
         public event Action<Inventory, Vector2Int> OnSlotContentChanged;
 
         public event Action<Inventory> OnDraggedSlotContentChanged;
+
+        /// <summary>
+        /// Initializes the inventory according to inventory dimentions. Creating the 2D slot matrix.
+        /// This method will also clear all the inventory slots and the dragged slot, so if no data is intended to be lost,
+        /// make sure to save the inventory first somewhere else, this method is called automatically when the inventory is created
+        /// or when the inventory dimentions are changed in the inspector or calling the corresponding methods.
+        /// </summary>
         public void InitializeInventory()
         {
             slots = new Slot[inventoryHorizontalSize, inventoryVerticalSize];
@@ -49,14 +61,27 @@ namespace Kosha82.InventorySystem
             InitializeInventory();
         }
 
-        public void Start()
+        private void Start()
         {
             OnInventorySizeChanged?.Invoke(this);
             OnInventoryContentChanged?.Invoke(this);
         }
 
         /// <summary>
-        /// Adds an item to the inventory. It first tries to add the item to existing slots that contain the same item. If there is still remaining amount, it will try to add the item to empty slots.
+        /// Changes the inventory size and reinitializes it. This will clear all the inventory slots and the dragged slot, so if no data is intended to be lost,
+        /// make sure to save the inventory first somewhere else.
+        /// </summary>
+        /// <param name="newHorizontalSize"></param>
+        /// <param name="newVerticalSize"></param>
+        public void OnChangeSize(int newHorizontalSize, int newVerticalSize)
+        {
+            inventoryHorizontalSize = newHorizontalSize;
+            inventoryVerticalSize = newVerticalSize;
+            InitializeInventory();
+        }
+
+        /// <summary>
+        /// Adds an item to the inventory. It first tries to add the item to existing slots that contain the same item. If there's no slot with the same item, it will try to add the item to empty slots.
         /// </summary>
         /// <param name="item"></param>
         /// <param name="amount"></param>
@@ -144,8 +169,8 @@ namespace Kosha82.InventorySystem
         /// <summary>
         /// Swaps the contents of two slots in the inventory. If either slot is empty, it will simply copy the contents of the other slot to the empty one.
         /// </summary>
-        /// <param name="posA"></param>
-        /// <param name="posB"></param>
+        /// <param name="posA">first slot position in the matrix</param>
+        /// <param name="posB">second slot position in the matrix</param>
         public void SwapSlots(Vector2Int posA, Vector2Int posB)
         {
             Slot slotA = GetSlot(posA.x, posA.y);
@@ -166,7 +191,7 @@ namespace Kosha82.InventorySystem
         /// <summary>
         /// Swaps the contents of the dragged slot with a specified slot in the inventory. If either slot is empty, it will simply copy the contents of the other slot to the empty one.
         /// </summary>
-        /// <param name="posB"></param>
+        /// <param name="posB">position of the slot to swap with</param>
         public void SwapDraggedSlot(Vector2Int posB)
         {
             Slot slotB = GetSlot(posB.x, posB.y);
@@ -186,12 +211,19 @@ namespace Kosha82.InventorySystem
         /// <summary>
         /// Retrieves a slot from the inventory based on its position. Returns null if the position is out of bounds.
         /// </summary>
-        /// <param name="position"></param>
+        /// <param name="position">position of the slot to retrieve</param>
         /// <returns></returns>
         public Slot GetSlot(Vector2Int position)
         {
             return GetSlot(position.x, position.y);
         }
+
+        /// <summary>
+        /// Retrieves a slot from the inventory based on its x and y coordinates. Returns null if the coordinates are out of bounds.
+        /// </summary>
+        /// <param name="x">x-coordinate of the slot to retrieve</param>
+        /// <param name="y">y-coordinate of the slot to retrieve</param>
+        /// <returns></returns>
         public Slot GetSlot(int x, int y)
         {
             if (x >= 0 && x < inventoryHorizontalSize && y >= 0 && y < inventoryVerticalSize)
@@ -208,9 +240,9 @@ namespace Kosha82.InventorySystem
         /// <summary>
         /// Merges the contents of two slots in the inventory. If the items in both slots are the same and the target slot has enough space, it will transfer as many items as possible from the source slot to the target slot.
         /// </summary>
-        /// <param name="sourcePos"></param>
-        /// <param name="targetPos"></param>
-        /// <returns></returns>
+        /// <param name="sourcePos">position of the source slot</param>
+        /// <param name="targetPos">position of the target slot</param>
+        /// <returns>success of the merge operation</returns>
         public bool MergeSlots(Vector2Int sourcePos, Vector2Int targetPos)
         {
             Slot sourceSlot = GetSlot(sourcePos);
@@ -236,7 +268,7 @@ namespace Kosha82.InventorySystem
         /// <summary>
         /// Merges the contents of the dragged slot with a specified slot in the inventory. If the items in both slots are the same and the target slot has enough space, it will transfer as many items as possible from the dragged slot to the target slot.
         /// </summary>
-        /// <param name="targetPos"></param>
+        /// <param name="targetPos">position of the target slot</param>
         /// <returns></returns>
         public bool MergeSlotWithDragged(Vector2Int targetPos)
         {
@@ -334,7 +366,7 @@ namespace Kosha82.InventorySystem
 
 
         /// <summary>
-        /// Transfers a specified amount of items from a slot in the inventory to the dragged slot. If the source slot has fewer items than the specified amount, it will transfer all items from the source slot and return the remaining amount that could not be transferred.
+        /// Transfers a specified amount of items from a slot in the inventory to the dragged slot. If the source slot has fewer items than the specified amount, it will transfer all items from the source slot and return true if at least an item was transferred.
         /// </summary>
         /// <param name="position"></param>
         /// <param name="amount"></param>
@@ -348,7 +380,7 @@ namespace Kosha82.InventorySystem
             Item itemToTransfer = sourceSlot.CurrentItem;
             if (itemToTransfer == null) return false;
 
-            if (sourceSlot.CurrentAmount < amount) return false;
+            amount = Math.Min(amount, sourceSlot.CurrentAmount);
 
             int remainingAmount = RemoveItemFromSlot(position, amount);
 
@@ -358,7 +390,7 @@ namespace Kosha82.InventorySystem
         }
 
         /// <summary>
-        /// Transfers a specified amount of items from the dragged slot to a slot in the inventory. If the dragged slot has fewer items than the specified amount, it will transfer all items from the dragged slot and return the remaining amount that could not be transferred.
+        /// Transfers a specified amount of items from the dragged slot to a slot in the inventory. If the dragged slot has fewer items than the specified amount, it will transfer all items from the dragged slot and return if the transfer was successful.
         /// </summary>
         /// <param name="position"></param>
         /// <param name="amount"></param>
@@ -369,13 +401,34 @@ namespace Kosha82.InventorySystem
 
             Item itemToTransfer = draggedSlot.CurrentItem;
             if (itemToTransfer == null) return false;
-            if (draggedSlot.CurrentAmount < amount) return false;
+
+            amount = Math.Min(amount, draggedSlot.CurrentAmount);
+
             if (GetSlot(position).CurrentAmount + amount > itemToTransfer.StackSize) return false;
 
             int remainingAmount = RemoveItemFromDraggedSlot(amount);
             AddItemToSlot(position, itemToTransfer, amount - remainingAmount);
 
             return remainingAmount == 0;
+        }
+
+        /// <summary>
+        /// Forcefully sets the content of a slot in the inventory to a specified item and amount,
+        /// it is not recommended to use, unless it's used for testing or if you know you're doing building
+        /// a custom method yourself, but be aware of the fact that this method will not check the stack size or the current state of the slot,
+        /// it will just set the item and amount and change the inventory UI accordingly.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="item"></param>
+        /// <param name="amount"></param>
+        public void ForceSetSlot(Vector2Int position, Item item, int amount)
+        {
+            Slot slot = GetSlot(position);
+            if (slot != null)
+            {
+                slot.ForceSet(item, amount);
+                OnSlotContentChanged?.Invoke(this, position);
+            }
         }
     }
 }

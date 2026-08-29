@@ -2,6 +2,12 @@ using UnityEngine;
 
 namespace Kosha82.InventorySystem
 {
+
+    /// <summary>
+    /// Represents a single slot with an item and its amount. It is read only outside of this assembly (asmdef),
+    /// and all modifications must be done through the Inventory class, to make sure that
+    /// in case a UI is used, all the events are triggered and the inventory UI is updated accordingly.
+    /// </summary>
     public class Slot
     {
         public Item CurrentItem { get; private set; }
@@ -19,7 +25,7 @@ namespace Kosha82.InventorySystem
         /// <param name="item"></param>
         /// <param name="amount"></param>
         /// <returns>the remaining amount that could not be added</returns>
-        public int AddItem(Item item, int amount)
+        internal int AddItem(Item item, int amount)
         {
             if (item == null || amount <= 0) return amount;
 
@@ -39,7 +45,7 @@ namespace Kosha82.InventorySystem
         /// </summary>
         /// <param name="amount"></param>
         /// <returns>the remaining amount that could not be added</returns>
-        public int AddAmount(int amount)
+        internal int AddAmount(int amount)
         {
             if (CurrentItem != null && !IsFull())
             {
@@ -59,7 +65,7 @@ namespace Kosha82.InventorySystem
         /// </summary>
         /// <param name="amount"></param>
         /// <returns>the remaining amount that could not be removed</returns>
-        public int RemoveItem(int amount)
+        internal int RemoveItem(int amount)
         {
             CurrentAmount -= amount;
             int remainingAmount = Mathf.Max(0, -CurrentAmount);
@@ -72,13 +78,17 @@ namespace Kosha82.InventorySystem
             return remainingAmount;
         }
 
-        public void CopyFrom(Slot otherSlot)
+        /// <summary>
+        /// Copies the item and amount from another slot to this slot.
+        /// </summary>
+        /// <param name="otherSlot"></param>
+        internal void CopyFrom(Slot otherSlot)
         {
             CurrentItem = otherSlot.CurrentItem;
             CurrentAmount = otherSlot.CurrentAmount;
         }
 
-        public void ClearSlot()
+        internal void ClearSlot()
         {
             CurrentItem = null;
             CurrentAmount = 0;
@@ -101,13 +111,19 @@ namespace Kosha82.InventorySystem
         /// </summary>
         /// <param name="item"></param>
         /// <param name="amount"></param>
-        public void ForceSet(Item item, int amount)
+        internal void ForceSet(Item item, int amount)
         {
             CurrentItem = item;
             CurrentAmount = amount;
         }
 
-        public bool MergeWith(Slot otherSlot)
+        /// <summary>
+        /// Merges the current slot with another slot. If both slots contain the same item and the current slot is not full, it will transfer as many items as possible from the other slot to the current slot.
+        /// If the current slot is full or the items are different, it will not transfer any items and return false. If the transfer is successful, it will return true.
+        /// </summary>
+        /// <param name="otherSlot"></param>
+        /// <returns></returns>
+        internal bool MergeWith(Slot otherSlot)
         {
             if (this.IsEmpty() || otherSlot.IsEmpty()) return false;
 
