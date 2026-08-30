@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Kosha82.InventorySystem
 {
-    [CreateAssetMenu(fileName = "Item", menuName = "Scriptable Objects/Item")]
+    [CreateAssetMenu(fileName = "Item", menuName = "Inventory System/Item")]
     public class Item : ScriptableObject
     {
         [SerializeField] private string itemName;

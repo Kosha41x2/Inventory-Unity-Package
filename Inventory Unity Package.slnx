@@ -1,5 +1,5 @@
 ﻿<Solution>
+  <Project Path="InventorySystemExamples.csproj" />
   <Project Path="NewAssembly.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
-  <Project Path="InventorySystemExamples.csproj" />
 </Solution>
