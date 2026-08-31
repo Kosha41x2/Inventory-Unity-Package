@@ -51,8 +51,6 @@ namespace Kosha82.InventorySystem
                 }
             }
 
-            draggedSlot = new Slot();
-
             OnInventorySizeChanged?.Invoke(this);
         }
         private void OnValidate()
@@ -296,13 +294,17 @@ namespace Kosha82.InventorySystem
         /// </summary>
         /// <param name="position"></param>
         /// <param name="amount"></param>
+        /// <param name="destroyItemIfEmptyAndDynamic">If the slot is empty and destroyItemIfEmptyAndDynamic is true, it will permanently destroy the item if it is a dynamic item.
+        /// It is usually recomended to let the value of destroyItemIfEmptyAndDynamic to true, as it will prevent memory leaks when using dynamic items, as they are created at runtime.
+        /// Only set it to false if you want to keep the item instance for some reason. (It does not affect non-dynamic items, as they are not created at runtime and are not destroyed when the slot is cleared)
+        /// </param>
         /// <returns></returns>
-        public int RemoveItemFromSlot(Vector2Int position, int amount)
+        public int RemoveItemFromSlot(Vector2Int position, int amount, bool destroyItemIfEmptyAndDynamic = true)
         {
             Slot slot = GetSlot(position);
             if (slot != null)
             {
-                int remaining = slot.RemoveItem(amount);
+                int remaining = slot.RemoveItem(amount, destroyItemIfEmptyAndDynamic);
                 OnSlotContentChanged?.Invoke(this, position);
                 return remaining;
             }
@@ -314,12 +316,16 @@ namespace Kosha82.InventorySystem
         /// Removes a specified amount of items from the dragged slot. If the dragged slot has fewer items than the specified amount, it will remove all items from the dragged slot and return the remaining amount that could not be removed.
         /// </summary>
         /// <param name="amount"></param>
+        /// <param name="destroyItemIfEmptyAndDynamic">If the dragged slot is empty and destroyItemIfEmptyAndDynamic is true, it will permanently destroy the item if it is a dynamic item.
+        /// It is usually recomended to let the value of destroyItemIfEmptyAndDynamic to true, as it will prevent memory leaks when using dynamic items, as they are created at runtime.
+        /// Only set it to false if you want to keep the item instance for some reason. (It does not affect non-dynamic items, as they are not created at runtime and are not destroyed when the slot is cleared)
+        /// </param>
         /// <returns></returns>
-        public int RemoveItemFromDraggedSlot(int amount)
+        public int RemoveItemFromDraggedSlot(int amount, bool destroyItemIfEmptyAndDynamic = true)
         {
             if (draggedSlot != null)
             {
-                int remaining = draggedSlot.RemoveItem(amount);
+                int remaining = draggedSlot.RemoveItem(amount, destroyItemIfEmptyAndDynamic);
                 OnDraggedSlotContentChanged?.Invoke();
                 return remaining;
             }
@@ -382,7 +388,7 @@ namespace Kosha82.InventorySystem
 
             amount = Math.Min(amount, sourceSlot.CurrentAmount);
 
-            int remainingAmount = RemoveItemFromSlot(position, amount);
+            int remainingAmount = RemoveItemFromSlot(position, amount, false);
 
             AddItemToDraggedSlot(itemToTransfer, amount - remainingAmount);
 
@@ -406,11 +412,12 @@ namespace Kosha82.InventorySystem
 
             if (GetSlot(position).CurrentAmount + amount > itemToTransfer.StackSize) return false;
 
-            int remainingAmount = RemoveItemFromDraggedSlot(amount);
+            int remainingAmount = RemoveItemFromDraggedSlot(amount, false);
             AddItemToSlot(position, itemToTransfer, amount - remainingAmount);
 
             return remainingAmount == 0;
         }
+
 
         /// <summary>
         /// Forcefully sets the content of a slot in the inventory to a specified item and amount,
