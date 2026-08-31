@@ -57,4 +57,9 @@
     align-self: flex-start;
     width: 25%;
     height: 25%;
+    aspect-ratio: 1;
+}
+
+.damage {
+    top: 75%;
 }

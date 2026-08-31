@@ -48,6 +48,7 @@ namespace Kosha82.InventorySystem
             inventory.OnDraggedSlotContentChanged += UpdateDraggedSlotVisuals;
 
             BuildInventory(inventory);
+            CursorFrameUI.InitializeCursorFrame(root, uiSettings);
             InitializeComponentStyleMappingDict();
         }
 
@@ -83,8 +84,6 @@ namespace Kosha82.InventorySystem
         void BuildInventory(Inventory inventory)
         {
             inventoryPanel.Clear();
-
-            CursorFrameUI.InitializeCursorFrame(root, uiSettings);
 
             int rows = inventory.InventoryVerticalSize;
             int columns = inventory.InventoryHorizontalSize;

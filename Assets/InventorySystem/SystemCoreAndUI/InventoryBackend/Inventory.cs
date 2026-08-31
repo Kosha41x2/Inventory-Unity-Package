@@ -51,6 +51,11 @@ namespace Kosha82.InventorySystem
                 }
             }
 
+            if(draggedSlot == null)
+            {
+                draggedSlot = new Slot();
+            }
+
             OnInventorySizeChanged?.Invoke(this);
         }
         private void OnValidate()
@@ -385,6 +390,7 @@ namespace Kosha82.InventorySystem
 
             Item itemToTransfer = sourceSlot.CurrentItem;
             if (itemToTransfer == null) return false;
+            if(!itemToTransfer.CanStackWith(draggedSlot.CurrentItem) && draggedSlot.CurrentItem != null) return false;
 
             amount = Math.Min(amount, sourceSlot.CurrentAmount);
 
@@ -407,6 +413,7 @@ namespace Kosha82.InventorySystem
 
             Item itemToTransfer = draggedSlot.CurrentItem;
             if (itemToTransfer == null) return false;
+            if(!itemToTransfer.CanStackWith(GetSlot(position).CurrentItem) && GetSlot(position).CurrentItem != null) return false;
 
             amount = Math.Min(amount, draggedSlot.CurrentAmount);
 
