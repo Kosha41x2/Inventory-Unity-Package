@@ -96,7 +96,8 @@ namespace Kosha82.InventorySystem
                 for (int x = 0; x < inventoryHorizontalSize && amount > 0; x++)
                 {
                     Slot slot = GetSlot(x, y);
-                    if (slot.CurrentItem == item)
+                    if(item == null || slot == null || slot.IsEmpty()) continue;
+                    if (slot.CurrentItem.CanStackWith(item))
                     {
                         if (slot.IsFull()) continue;
 
@@ -145,15 +146,19 @@ namespace Kosha82.InventorySystem
         /// </summary>
         /// <param name="item"></param>
         /// <param name="amount"></param>
+        /// <param name="considerDynamicComponents">if true, the method will also consider dynamic components when matching items</param>
         /// <returns>the remaining amount that could not be deleted</returns>
-        public int DeleteItemFromInventory(Item item, int amount)
+        public int DeleteItemFromInventory(Item item, int amount, bool considerDynamicComponents = false)
         {
             for (int y = 0; y < inventoryVerticalSize && amount > 0; y++)
             {
                 for (int x = 0; x < inventoryHorizontalSize && amount > 0; x++)
                 {
                     Slot slot = GetSlot(x, y);
-                    if (slot.CurrentItem == item)
+                    if (slot.IsEmpty()) continue;
+                    if (slot.CurrentItem != null &&
+                     ((!considerDynamicComponents && slot.CurrentItem.ItemID == item.ItemID) ||
+                      (considerDynamicComponents && slot.CurrentItem.CanStackWith(item))))
                     {
                         amount = slot.RemoveItem(amount);
                         OnSlotContentChanged?.Invoke(this, new Vector2Int(x, y));

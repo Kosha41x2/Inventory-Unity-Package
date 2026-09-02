@@ -258,6 +258,8 @@ namespace Kosha82.InventorySystem
             Label label = new Label();
             label.AddToClassList(styleClass);
             label.name = $"Label {itemFrame.name} {styleClass}";
+            label.style.position = Position.Absolute;
+
             itemFrame.Add(label);
             return label;
         }
@@ -287,6 +289,8 @@ namespace Kosha82.InventorySystem
             VisualElement imageElement = new VisualElement();
             imageElement.AddToClassList(styleClass);
             imageElement.name = $"Image {itemFrame.name} {styleClass}";
+            imageElement.style.position = Position.Absolute;
+
             itemFrame.Add(imageElement);
             return imageElement;
         }

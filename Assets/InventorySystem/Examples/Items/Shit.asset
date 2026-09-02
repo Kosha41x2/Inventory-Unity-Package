@@ -16,4 +16,6 @@ MonoBehaviour:
   itemIcon: {fileID: 2800000, guid: be9137c44ed2f6f4d8c66a783bb5e505, type: 3}
   itemID: 0
   stackSize: 10
-  itemComponents: []
+  itemComponents:
+  - {fileID: 11400000, guid: 2c574a86cece8464993207be07db0da6, type: 2}
+  - {fileID: 11400000, guid: c3b13182d7588664db297ba812d75a54, type: 2}

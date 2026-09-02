@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using Kosha82.InventorySystem;
+using Kosha82.InventorySystem.Examples;
 
 public class Test: MonoBehaviour
 {
@@ -18,6 +19,11 @@ public class Test: MonoBehaviour
                 inventory.AddItemToInventory(item, 1);
                 Debug.Log(inventory.GetSlot(0, 0).CurrentItem?.ItemName);
             }
+        }
+
+        if(Keyboard.current.numpadPlusKey.wasPressedThisFrame)
+        {
+            inventory.GetSlot(0, 0).CurrentItem.getComponent<ItemDamage>().IncreaseDamage(1);
         }
     }
 }

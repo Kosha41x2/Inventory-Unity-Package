@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ab7c76f23578cd4d86b5b73b9a43179, type: 3}
   m_Name: Light
   m_EditorClassIdentifier: InventorySystemExamples::ElementComponent
-  inInventoryDisplayImage: {fileID: 0}
+  inInventoryDisplayImage: {fileID: 21300000, guid: 0d1441c06e21e394497fb488fe24b442, type: 3}
   inInventoryDisplayTag: Element
-  elementType: 0
+  elementType: 7

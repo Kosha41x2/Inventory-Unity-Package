@@ -42,5 +42,10 @@ namespace Kosha82.InventorySystem.Examples
             }
             return false;
         }
+
+        public void IncreaseDamage(int amount)
+        {
+            damage += amount;
+        }
     }
 }

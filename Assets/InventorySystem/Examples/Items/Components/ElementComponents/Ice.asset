@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ab7c76f23578cd4d86b5b73b9a43179, type: 3}
   m_Name: Ice
   m_EditorClassIdentifier: InventorySystemExamples::ElementComponent
-  inInventoryDisplayImage: {fileID: 0}
+  inInventoryDisplayImage: {fileID: -7560284153744367771, guid: 3cd3ecc7370d91b4ab74a36a85e53aa6, type: 3}
   inInventoryDisplayTag: Element
-  elementType: 0
+  elementType: 5

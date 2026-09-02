@@ -58,8 +58,12 @@
     width: 25%;
     height: 25%;
     aspect-ratio: 1;
+    bottom: 75%;
 }
 
 .damage {
     top: 75%;
+    color: rgb(218, 218, 218);
+    font-size: 15px;
+    -unity-font-style: bold;
 }
