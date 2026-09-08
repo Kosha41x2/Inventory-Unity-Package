@@ -8,8 +8,10 @@ namespace Kosha82.InventorySystem
     /// An item that implements a dynamic component will be automatically treated as a unique instance, and will not stack with other items of the same type unless they have the same dynamic component state.
     /// </summary>
     public interface IItemDynamicComponent
-    {
+    {   
         IItemDynamicComponent CreateInstance(IItemDynamicComponent itemInstance);
         bool CanStackWith(IItemDynamicComponent otherComponent);
+
+        void OnInitialize(Item item);
     }
 }

@@ -35,7 +35,10 @@ namespace Kosha82.InventorySystem
 
             foreach(ItemComponent itemComponent in ItemComponents)
             {
-                itemComponent.SetParentItem(this);
+                if(itemComponent is IItemDynamicComponent itemDynamicComponent)
+                {
+                    itemDynamicComponent.OnInitialize(this);
+                }
             }
         }
 
@@ -180,11 +183,14 @@ namespace Kosha82.InventorySystem
                 if(component is IItemDynamicComponent itemDynamicComponent)
                 {
                     IsDynamic = true;
-                    component = (ItemComponent)itemDynamicComponent.CreateInstance(itemDynamicComponent);
+                    itemDynamicComponent = itemDynamicComponent.CreateInstance(itemDynamicComponent);
+                    itemDynamicComponent.OnInitialize(this);
+                    itemComponents.Add(itemDynamicComponent as ItemComponent);
                 }
-
-                itemComponents.Add(component);
-                component.SetParentItem(this);
+                else
+                {
+                    itemComponents.Add(component);
+                }
             }
             else
             {
