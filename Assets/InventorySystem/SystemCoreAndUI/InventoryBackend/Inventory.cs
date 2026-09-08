@@ -48,12 +48,19 @@ namespace Kosha82.InventorySystem
                 for (int y = 0; y < inventoryVerticalSize; y++)
                 {
                     slots[x, y] = new Slot();
+
+                    int capturedX = x;
+                    int capturedY = y;
+
+                    GetSlot(capturedX, capturedY).OnSlotItemChanged += () => OnSlotContentChanged?.Invoke(this, new Vector2Int(capturedX, capturedY));
                 }
             }
 
             if(draggedSlot == null)
             {
                 draggedSlot = new Slot();
+
+                draggedSlot.OnSlotItemChanged += () => OnDraggedSlotContentChanged?.Invoke();
             }
 
             OnInventorySizeChanged?.Invoke(this);

@@ -10,13 +10,37 @@ namespace Kosha82.InventorySystem
     /// </summary>
     public class Slot
     {
-        public Item CurrentItem { get; private set; }
+        private Item currentItem;
+        public Item CurrentItem { get => currentItem;
+         private set
+            {
+                if (currentItem != null)
+                {
+                    currentItem.OnItemChanged -= TriggerSlotChanged;
+                }
+
+                currentItem = value;
+
+                if (currentItem != null)
+                {
+                    currentItem.OnItemChanged += TriggerSlotChanged;
+                }
+
+                TriggerSlotChanged();
+            }
+        }
         public int CurrentAmount { get; private set; }
 
+        public event System.Action OnSlotItemChanged;
         public Slot()
         {
             CurrentItem = null;
             CurrentAmount = 0;
+        }
+
+        void TriggerSlotChanged()
+        {
+            OnSlotItemChanged?.Invoke();
         }
 
         /// <summary>
@@ -114,6 +138,7 @@ namespace Kosha82.InventorySystem
         internal void ClearAndDestroySlot()
         {
             if(CurrentItem == null || !CurrentItem.IsACopy) return;
+
             Object.Destroy(CurrentItem);
             CurrentItem = null;
             CurrentAmount = 0;

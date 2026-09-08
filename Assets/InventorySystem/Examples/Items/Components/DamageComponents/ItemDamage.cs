@@ -11,7 +11,12 @@ namespace Kosha82.InventorySystem.Examples
         [SerializeField]
         private int damage = 1;
 
+        private Item parentItem;
+
         public int Damage => damage;
+
+        
+        public event System.Action OnComponentChanged;
 
         public string GetInInventoryDisplayText()
         {
@@ -43,9 +48,15 @@ namespace Kosha82.InventorySystem.Examples
             return false;
         }
 
+        public void OnInitialize(Item item)
+        {
+            parentItem = item;
+        }
+
         public void IncreaseDamage(int amount)
         {
             damage += amount;
+            OnComponentChanged?.Invoke();
         }
     }
 }

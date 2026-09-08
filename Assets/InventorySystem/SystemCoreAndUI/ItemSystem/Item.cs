@@ -22,6 +22,8 @@ namespace Kosha82.InventorySystem
         public int StackSize => stackSize;
         public IEnumerable<ItemComponent> ItemComponents => itemComponents;
 
+        public event System.Action OnItemChanged;
+
         /// <summary>
         /// Indicates whether this item has any dynamic components. Dynamic components are those that implement the IItemDynamicComponent interface.
         /// </summary>
@@ -29,17 +31,27 @@ namespace Kosha82.InventorySystem
         public bool IsDynamic {get; private set;} = false;
         public bool IsACopy {get; private set;} = false;
 
+        private static bool isCloning = false;
+
         void OnEnable()
         {
             IsDynamic = HasDynamicComponents();
+
+            if(isCloning || !IsDynamic) return;
 
             foreach(ItemComponent itemComponent in ItemComponents)
             {
                 if(itemComponent is IItemDynamicComponent itemDynamicComponent)
                 {
                     itemDynamicComponent.OnInitialize(this);
+                    itemDynamicComponent.OnComponentChanged += TriggerItemChanged;
                 }
             }
+        }
+
+        void TriggerItemChanged()
+        {
+            OnItemChanged?.Invoke();
         }
 
         public T getComponent<T>() where T : ItemComponent
@@ -157,7 +169,9 @@ namespace Kosha82.InventorySystem
         /// <returns></returns>
         public Item CreateInstance()
         {
+            isCloning = true;
             Item newItem = ScriptableObject.Instantiate(this);
+            isCloning = false;
 
             newItem.itemComponents = new List<ItemComponent>();
 
@@ -185,6 +199,7 @@ namespace Kosha82.InventorySystem
                     IsDynamic = true;
                     itemDynamicComponent = itemDynamicComponent.CreateInstance(itemDynamicComponent);
                     itemDynamicComponent.OnInitialize(this);
+                    itemDynamicComponent.OnComponentChanged += TriggerItemChanged;
                     itemComponents.Add(itemDynamicComponent as ItemComponent);
                 }
                 else
@@ -200,11 +215,14 @@ namespace Kosha82.InventorySystem
 
         void OnDestroy()
         {
+            if(!IsACopy) return;
+
             foreach (var component in itemComponents)
             {
                 if (component is IItemDynamicComponent dynamicComponent)
                 {
                     Object.Destroy(dynamicComponent as Object);
+                    dynamicComponent.OnComponentChanged -= TriggerItemChanged;
                 }
             }
         }

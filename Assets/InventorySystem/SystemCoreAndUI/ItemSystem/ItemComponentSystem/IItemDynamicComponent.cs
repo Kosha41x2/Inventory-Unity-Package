@@ -9,6 +9,7 @@ namespace Kosha82.InventorySystem
     /// </summary>
     public interface IItemDynamicComponent
     {   
+        event System.Action OnComponentChanged;
         IItemDynamicComponent CreateInstance(IItemDynamicComponent itemInstance);
         bool CanStackWith(IItemDynamicComponent otherComponent);
 
