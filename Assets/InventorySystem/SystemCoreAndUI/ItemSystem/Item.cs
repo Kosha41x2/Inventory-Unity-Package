@@ -160,20 +160,36 @@ namespace Kosha82.InventorySystem
 
             foreach (var component in this.itemComponents)
             {
-                if(component is IItemDynamicComponent dynamicComponent)
-                {
-                    ItemComponent newComponent = (ItemComponent)dynamicComponent.CreateInstance(dynamicComponent);
-                    newComponent.SetParentItem(newItem);
-                    newItem.itemComponents.Add(newComponent as ItemComponent);
-                }
-                else
-                {
-                    var newComponent = component;
-                    newItem.itemComponents.Add(newComponent);
-                }
+                newItem.AddComponent(component);
             }
             newItem.IsACopy = true;
             return newItem;
+        }
+
+    
+        public void AddComponent(ItemComponent component)
+        {
+            if (component == null)
+            {
+                Debug.LogError("Cannot add a null component to the item.");
+                return;
+            }
+
+            if (!itemComponents.Contains(component))
+            {
+                if(component is IItemDynamicComponent itemDynamicComponent)
+                {
+                    IsDynamic = true;
+                    component = (ItemComponent)itemDynamicComponent.CreateInstance(itemDynamicComponent);
+                }
+
+                itemComponents.Add(component);
+                component.SetParentItem(this);
+            }
+            else
+            {
+                Debug.LogWarning($"The component {component.name} is already added to the item {this.name}.");
+            }
         }
 
         void OnDestroy()
