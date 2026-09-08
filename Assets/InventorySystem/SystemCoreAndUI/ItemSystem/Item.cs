@@ -32,6 +32,11 @@ namespace Kosha82.InventorySystem
         void OnEnable()
         {
             IsDynamic = HasDynamicComponents();
+
+            foreach(ItemComponent itemComponent in ItemComponents)
+            {
+                itemComponent.SetParentItem(this);
+            }
         }
 
         public T getComponent<T>() where T : ItemComponent
@@ -157,7 +162,8 @@ namespace Kosha82.InventorySystem
             {
                 if(component is IItemDynamicComponent dynamicComponent)
                 {
-                    var newComponent = dynamicComponent.CreateInstance(dynamicComponent);
+                    ItemComponent newComponent = (ItemComponent)dynamicComponent.CreateInstance(dynamicComponent);
+                    newComponent.SetParentItem(newItem);
                     newItem.itemComponents.Add(newComponent as ItemComponent);
                 }
                 else

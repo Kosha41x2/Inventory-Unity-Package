@@ -7,6 +7,13 @@ namespace Kosha82.InventorySystem
     /// </summary>
     public abstract class ItemComponent : ScriptableObject
     {
+        private Item parentItem;
 
+        public Item ParentItem => parentItem;
+
+        public void SetParentItem(Item parentItem)
+        {
+            this.parentItem = parentItem;
+        }
     }
 }
