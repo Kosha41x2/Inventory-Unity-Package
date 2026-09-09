@@ -11,6 +11,7 @@ namespace Kosha82.InventorySystem.Examples
         public void GetSomeItems(InventoryInputDownEventInfo evt)
         {
             if (!evt.ContextInfo.HasSlotBeenClicked()) return;
+            if(evt.ContextInfo.Target.parent != evt.ContextInfo.ClickedSlot) return;
 
 
             VisualElement slotElement = evt.ContextInfo.ClickedSlot;

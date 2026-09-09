@@ -9,6 +9,7 @@ namespace Kosha82.InventorySystem.Examples
         public void PickItems(InventoryInputDownEventInfo evt)
         {
             if (!evt.ContextInfo.HasSlotBeenClicked()) return;
+            if(evt.ContextInfo.Target.parent != evt.ContextInfo.ClickedSlot) return;
 
             SlotDirection slotDirection = evt.ContextInfo.GetSlotDirection();
             VisualElement slotElement = evt.ContextInfo.ClickedSlot;
