@@ -18,6 +18,8 @@ namespace Kosha82.InventorySystem
         private List<SlotMoveBinding> slotMoveActionBindings = new List<SlotMoveBinding>();
         public static bool isDragging = false;
 
+        private static ItemManipulator activeDragger;
+
         /// <summary>
         /// Initializes a new instance of the ItemManipulator class.
         /// </summary>
@@ -98,6 +100,7 @@ namespace Kosha82.InventorySystem
         /// <param name="evt">The pointer down event data.</param>
         private void OnPointerDown(PointerDownEvent evt)
         {
+            Debug.Log("OnPointerDown" + "target: " + target.name + " button: " + evt.button + " modifiers: " + evt.modifiers);
             bool executed = false;
             bool isDraggingTemp = isDragging; // Store the current dragging state for the execution order not to affect the action bindings.
             timeWhenPointerDown = Time.unscaledTime; // Record the time when the pointer is pressed down.
@@ -152,6 +155,7 @@ namespace Kosha82.InventorySystem
                         slotClassName)));
                 }
             }
+
             UpdateGlobalSubscriptions(isDraggingTemp);
         }
 
@@ -177,18 +181,31 @@ namespace Kosha82.InventorySystem
 
         private void UpdateGlobalSubscriptions(bool wasDragging)
         {
+            if(wasDragging && !isDragging && activeDragger != null)
+            {
+                activeDragger.UnregisterGlobalSubscriptions();
+                activeDragger = null;
+            }
+
             if (!wasDragging && isDragging)
             {
-                target.panel.visualTree.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-                target.panel.visualTree.RegisterCallback<PointerDownEvent>(OnPointerDown);
-                target.panel.visualTree.RegisterCallback<PointerUpEvent>(OnPointerUp);
+                activeDragger = this;
+                RegisterGlobalSubscriptions();
             }
-            else if (wasDragging && !isDragging)
-            {
-                target.panel.visualTree.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
-                target.panel.visualTree.UnregisterCallback<PointerDownEvent>(OnPointerDown);
-                target.panel.visualTree.UnregisterCallback<PointerUpEvent>(OnPointerUp);
-            }
+        }
+
+        private void UnregisterGlobalSubscriptions()
+        {
+            target.panel.visualTree.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
+            target.panel.visualTree.UnregisterCallback<PointerDownEvent>(OnPointerDown);
+            target.panel.visualTree.UnregisterCallback<PointerUpEvent>(OnPointerUp);
+        }
+
+        private void RegisterGlobalSubscriptions()
+        {
+            target.panel.visualTree.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+            target.panel.visualTree.RegisterCallback<PointerDownEvent>(OnPointerDown);
+            target.panel.visualTree.RegisterCallback<PointerUpEvent>(OnPointerUp);
         }
     }
 }
