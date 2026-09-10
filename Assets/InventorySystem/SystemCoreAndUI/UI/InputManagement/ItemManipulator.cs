@@ -179,6 +179,11 @@ namespace Kosha82.InventorySystem
             return null;
         }
 
+        /// <summary>
+        /// Updates global subscriptions based on the dragging state. If dragging has started, it registers global
+        /// callbacks; if dragging has stopped, it unregisters them. This ensures that only one instance of ItemManipulator handles global pointer events at a time.
+        /// </summary>
+        /// <param name="wasDragging">The previous dragging state before the current event.</param>
         private void UpdateGlobalSubscriptions(bool wasDragging)
         {
             if(wasDragging && !isDragging && activeDragger != null)
