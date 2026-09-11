@@ -13,9 +13,14 @@ namespace Kosha82.InventorySystem.Crafting
     [System.Serializable]
     public class Ingredient
     {
+        [SerializeField]
+        [Tooltip("The icon representing this ingredient.")]
+        Texture2D icon;
+
         [SerializeReference]
-        List<Criteria> criterias = new List<Criteria>() {new IDCriteria(),
-                                                        new QuantityCriteria()};
+        [Tooltip("The list of criteria that must be fulfilled for this ingredient to be considered valid.")]
+        List<Criteria> criterias = new List<Criteria> {new IDCriteria(),
+                                                    new QuantityCriteria()};
 
         /// <summary>
         /// Checks if the given inventory slot fulfills all the criteria defined in this ingredient.

@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85f23f567d2d91647ba2169a215f6a8d, type: 3}
+  m_Name: Recipe
+  m_EditorClassIdentifier: Assembly-CSharp::Kosha82.InventorySystem.Crafting.Recipe
+  gridSize: {x: 3, y: 3}
+  ingredients:
+  - criterias:
+    - rid: 704758580191428762
+    - rid: 704758580191428763
+  - criterias:
+    - rid: 704758580191428764
+    - rid: 704758580191428765
+  - criterias:
+    - rid: 704758580191428766
+    - rid: 704758580191428767
+  - criterias:
+    - rid: 704758580191428768
+    - rid: 704758580191428769
+  - criterias:
+    - rid: 704758580191428770
+    - rid: 704758580191428771
+  - criterias:
+    - rid: 704758580191428772
+    - rid: 704758580191428773
+  - criterias:
+    - rid: 704758580191428774
+    - rid: 704758580191428775
+  - criterias:
+    - rid: 704758580191428776
+    - rid: 704758580191428777
+  - criterias:
+    - rid: 704758580191428778
+    - rid: 704758580191428779
+  references:
+    version: 2
+    RefIds:
+    - rid: 704758580191428762
+      type: {class: IDCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        item: {fileID: 0}
+    - rid: 704758580191428763
+      type: {class: QuantityCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        requiredQuantity: 1
+    - rid: 704758580191428764
+      type: {class: IDCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        item: {fileID: 0}
+    - rid: 704758580191428765
+      type: {class: QuantityCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        requiredQuantity: 1
+    - rid: 704758580191428766
+      type: {class: IDCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        item: {fileID: 0}
+    - rid: 704758580191428767
+      type: {class: QuantityCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        requiredQuantity: 1
+    - rid: 704758580191428768
+      type: {class: IDCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        item: {fileID: 0}
+    - rid: 704758580191428769
+      type: {class: QuantityCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        requiredQuantity: 1
+    - rid: 704758580191428770
+      type: {class: IDCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        item: {fileID: 0}
+    - rid: 704758580191428771
+      type: {class: QuantityCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        requiredQuantity: 1
+    - rid: 704758580191428772
+      type: {class: IDCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        item: {fileID: 0}
+    - rid: 704758580191428773
+      type: {class: QuantityCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        requiredQuantity: 1
+    - rid: 704758580191428774
+      type: {class: IDCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        item: {fileID: 0}
+    - rid: 704758580191428775
+      type: {class: QuantityCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        requiredQuantity: 1
+    - rid: 704758580191428776
+      type: {class: IDCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        item: {fileID: 0}
+    - rid: 704758580191428777
+      type: {class: QuantityCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        requiredQuantity: 1
+    - rid: 704758580191428778
+      type: {class: IDCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        item: {fileID: 0}
+    - rid: 704758580191428779
+      type: {class: QuantityCriteria, ns: Kosha82.InventorySystem.Crafting, asm: Assembly-CSharp}
+      data:
+        requiredQuantity: 1
